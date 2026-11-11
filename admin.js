@@ -80,6 +80,8 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
   const flash = (req, type, text) => { req.session.flash = { type, text }; };
   const notFound = (res) => res.status(404).render('mensaje', { title: 'Página no encontrada', text: 'La página que buscas no existe o no tienes acceso a ella.' });
 
+  router.param('id', (req, res, next, id) => (/^\d{1,9}$/.test(id) ? next() : notFound(res)));
+
   // ----- Solicitudes de registro -----
   router.get('/', async (req, res) => {
     const { rows } = await q("SELECT id, name, email, organization, created_at FROM users WHERE status = 'pending' ORDER BY created_at");
@@ -246,6 +248,22 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
   };
   router.post('/productos/:id/ocultar', setHidden(true));
   router.post('/productos/:id/mostrar', setHidden(false));
+
+  // ----- Sugerencias de los usuarios -----
+  router.get('/sugerencias', async (req, res) => {
+    const { rows } = await q(
+      `SELECT s.*, u.name AS user_name, u.organization AS user_org
+         FROM suggestions s JOIN users u ON u.id = s.user_id
+        WHERE NOT s.reviewed ORDER BY s.created_at`
+    );
+    res.render('admin-sugerencias', { title: 'Sugerencias', suggestions: rows });
+  });
+
+  router.post('/sugerencias/:id/revisada', async (req, res) => {
+    const { rowCount } = await q('UPDATE suggestions SET reviewed = true WHERE id = $1 AND NOT reviewed', [req.params.id]);
+    flash(req, rowCount ? 'success' : 'error', rowCount ? 'Sugerencia marcada como revisada.' : 'Esa sugerencia ya estaba revisada.');
+    res.redirect('/admin/sugerencias');
+  });
 
   // ----- Mi cuenta (menú de perfil) -----
   router.get('/cuenta', async (req, res) => {

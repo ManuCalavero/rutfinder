@@ -59,7 +59,7 @@ app.use(async (req, res, next) => {
   }
   if (req.user && req.user.role === 'admin') {
     // Contadores de la barra lateral del panel.
-    res.locals.counts = (await q("SELECT (SELECT count(*)::int FROM users WHERE status = 'pending') AS pending, (SELECT count(*)::int FROM products) AS products")).rows[0];
+    res.locals.counts = (await q("SELECT (SELECT count(*)::int FROM users WHERE status = 'pending') AS pending, (SELECT count(*)::int FROM products) AS products, (SELECT count(*)::int FROM suggestions WHERE NOT reviewed) AS suggestions")).rows[0];
   }
   res.locals.flash = req.session.flash || null;
   delete req.session.flash;
@@ -90,13 +90,15 @@ const requireAdmin = (req, res, next) => (isAdmin(req) ? next() : notFound(res))
 app.param('id', (req, res, next, id) => (/^\d{1,9}$/.test(id) ? next() : notFound(res)));
 
 // ---------- Páginas públicas, registro y sesión ----------
-const authLimiter = rateLimit({
+const limiter = () => rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 20,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => message(res, 429, 'Demasiados intentos', 'Has hecho demasiados intentos. Espera unos minutos y vuelve a probar.'),
 });
+const authLimiter = limiter();
+const suggestLimiter = limiter();
 const DUMMY_HASH = bcrypt.hashSync(crypto.randomBytes(16).toString('hex'), 12);
 const PENDING = ['Solicitud pendiente de aprobación', 'Hemos recibido tu solicitud. Podrás iniciar sesión cuando un administrador la apruebe.'];
 
@@ -160,6 +162,7 @@ async function listProducts(req, res, onlyFavorites) {
     products: await findProducts({ ...filters, userId: req.user.id, onlyFavorites }),
     countries: await listCountries(),
     here: req.originalUrl,
+    openSuggest: req.query.sugerir === '1',
   });
 }
 
@@ -192,6 +195,21 @@ app.post('/favoritos/:id', requireMember, async (req, res) => {
   // Solo se vuelve a rutas internas.
   const back = String(req.body.volver || '');
   res.redirect(/^\/(?![/\\])/.test(back) ? back : '/productos');
+});
+
+// ---------- Sugerencias de productos (un enlace, los datos a mano, o ambos) ----------
+app.post('/sugerencias', requireMember, suggestLimiter, async (req, res) => {
+  const text = (field, max) => String(req.body[field] || '').replace(/\r\n?/g, '\n').trim().slice(0, max);
+  const s = { url: text('url', 500), name: text('name', 300), producer: text('producer', 150), country: text('country', 100), notes: text('notes', 2000) };
+  let error = null;
+  if (!s.url && !s.name) error = 'Para sugerir un producto pega un enlace o escribe al menos su nombre.';
+  else if (s.url && !/^https?:\/\/[^\s]+\.[^\s]+$/i.test(s.url)) error = 'El enlace debe ser una dirección web completa (empieza por http:// o https://).';
+  if (!error) {
+    await q('INSERT INTO suggestions (user_id, url, name, producer, country, notes) VALUES ($1, $2, $3, $4, $5, $6)',
+      [req.user.id, s.url, s.name, s.producer, s.country, s.notes]);
+  }
+  req.session.flash = error ? { type: 'error', text: error } : { type: 'success', text: 'Gracias. Hemos recibido tu sugerencia y un administrador la revisará.' };
+  res.redirect(error ? '/productos?sugerir=1' : '/productos');
 });
 
 // ---------- Panel de administración (responde 404 a quien no sea admin) ----------

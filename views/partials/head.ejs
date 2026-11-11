@@ -9,67 +9,80 @@
 </head>
 <body>
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
-<% if (user && user.role === 'admin') { %>
+<% if (user) { %>
+<% const admin = user.role === 'admin'; %>
 <% const initials = user.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase(); %>
-<% const at = (prefix) => (path.startsWith(prefix) ? 'aria-current="page"' : ''); %>
-<header class="appbar">
-  <a class="brand" href="/admin"><span class="logo" aria-hidden="true">R</span>Rutfinder</a>
-  <details class="profile">
-    <summary aria-label="Menú de perfil de <%= user.name %>"><span class="avatar" aria-hidden="true"><%= initials %></span></summary>
-    <div class="profile-menu">
-      <p class="profile-who"><strong><%= user.name %></strong><span><%= user.email %></span></p>
-      <a href="/admin/cuenta">Editar mis datos</a>
-      <a href="/admin/cuenta#password">Cambiar contraseña</a>
-      <a href="/admin/usuarios?nuevo=1">Añadir usuario</a>
-      <form method="post" action="/logout">
-        <input type="hidden" name="_csrf" value="<%= csrf() %>">
-        <button type="submit">Cerrar sesión</button>
-      </form>
-    </div>
-  </details>
-</header>
+<% const cur = (on) => (on ? 'aria-current="page"' : ''); %>
 <div class="shell">
   <aside class="sidebar" id="sidebar">
-    <p class="sidebar-title nav-label">Administración</p>
-    <nav aria-label="Administración">
-      <a href="/admin" title="Solicitudes" <%- path === '/admin' || path.startsWith('/admin/usuarios/') ? 'aria-current="page"' : '' %>>
-        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M5 5h14l2 8v6H3v-6z"/></svg>
-        <span class="nav-label">Solicitudes</span>
-        <span class="count<%= counts.pending ? ' count-alert' : '' %>"><%= counts.pending %><span class="sr-only"> pendientes</span></span>
-      </a>
-      <a href="/admin/productos" title="Productos" <%- at('/admin/productos') || at('/productos') %>>
-        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
-        <span class="nav-label">Productos</span>
-        <span class="count"><%= counts.products %></span>
-      </a>
-      <a href="/admin/usuarios" title="Usuarios" <%- path === '/admin/usuarios' ? 'aria-current="page"' : '' %>>
-        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.8a3.5 3.5 0 010 6.4M18 14.8c2 .7 3.5 2.4 3.5 5.2"/></svg>
-        <span class="nav-label">Usuarios</span>
-      </a>
+    <div class="sidebar-top">
+      <a class="brand" href="<%= admin ? '/admin' : '/productos' %>"><span class="logo" aria-hidden="true">R</span><span class="nav-label">Rutfinder<small><%= admin ? 'Administración' : 'Repositorio RUTF' %></small></span></a>
+      <button type="button" class="sidebar-toggle" data-toggle-sidebar aria-controls="sidebar" aria-expanded="true" aria-label="Plegar o desplegar el menú" title="Plegar o desplegar el menú">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg>
+      </button>
+    </div>
+    <nav aria-label="Principal">
+      <% if (admin) { %>
+        <p class="nav-title nav-label">Gestión</p>
+        <a href="/admin" title="Solicitudes" <%- cur(path === '/admin' || path.startsWith('/admin/usuarios/')) %>>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M5 5h14l2 8v6H3v-6z"/></svg>
+          <span class="nav-label">Solicitudes</span>
+          <span class="count<%= counts.pending ? ' count-alert' : '' %>"><%= counts.pending %><span class="sr-only"> pendientes</span></span>
+        </a>
+        <a href="/admin/usuarios" title="Usuarios" <%- cur(path === '/admin/usuarios') %>>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.8a3.5 3.5 0 010 6.4M18 14.8c2 .7 3.5 2.4 3.5 5.2"/></svg>
+          <span class="nav-label">Usuarios</span>
+        </a>
+        <p class="nav-title nav-label">Catálogo</p>
+        <a href="/admin/productos" title="Productos" <%- cur(path.startsWith('/admin/productos') || path.startsWith('/productos')) %>>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
+          <span class="nav-label">Productos</span>
+          <span class="count"><%= counts.products %></span>
+        </a>
+        <a href="/admin/sugerencias" title="Sugerencias" <%- cur(path.startsWith('/admin/sugerencias')) %>>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.300 1 2.100h5c0-.8.4-1.600 1-2.100A6 6 0 0012 3z"/></svg>
+          <span class="nav-label">Sugerencias</span>
+          <span class="count<%= counts.suggestions ? ' count-alert' : '' %>"><%= counts.suggestions %><span class="sr-only"> sin revisar</span></span>
+        </a>
+      <% } else { %>
+        <p class="nav-title nav-label">Catálogo</p>
+        <a href="/productos" title="Productos" <%- cur(path.startsWith('/productos')) %>>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
+          <span class="nav-label">Productos</span>
+        </a>
+        <a href="/favoritos" title="Mis favoritos" <%- cur(path === '/favoritos') %>>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3.500l2.600 5.400 5.900.8-4.300 4.100 1 5.900-5.200-2.800-5.200 2.800 1-5.900-4.300-4.100 5.900-.8z"/></svg>
+          <span class="nav-label">Mis favoritos</span>
+        </a>
+      <% } %>
     </nav>
-    <button type="button" class="sidebar-toggle" data-toggle-sidebar aria-controls="sidebar" aria-expanded="true" title="Plegar o desplegar el menú">
-      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5v14M20 12H9M13 7l-5 5 5 5"/></svg>
-      <span class="nav-label">Plegar menú</span>
-    </button>
+    <details class="profile">
+      <summary aria-label="Menú de perfil de <%= user.name %>">
+        <span class="avatar" aria-hidden="true"><%= initials %></span>
+        <span class="nav-label profile-name"><%= user.name %></span>
+        <span class="nav-label profile-dots" aria-hidden="true">···</span>
+      </summary>
+      <div class="profile-menu">
+        <p class="profile-who"><strong><%= user.name %></strong><span><%= user.email %></span></p>
+        <% if (admin) { %>
+          <a href="/admin/cuenta">Editar mis datos</a>
+          <a href="/admin/cuenta#password">Cambiar contraseña</a>
+          <a href="/admin/usuarios?nuevo=1">Añadir usuario</a>
+        <% } %>
+        <form method="post" action="/logout">
+          <input type="hidden" name="_csrf" value="<%= csrf() %>">
+          <button type="submit">Cerrar sesión</button>
+        </form>
+      </div>
+    </details>
   </aside>
-  <div class="panel">
-    <p class="crumbs">Administración <span aria-hidden="true">/</span> <strong><%= title %></strong></p>
-    <main id="contenido" class="content">
+  <main id="contenido" class="content">
 <% } else { %>
 <header class="header">
   <a class="brand" href="/"><span class="logo" aria-hidden="true">R</span>Rutfinder</a>
   <nav class="header-nav" aria-label="Principal">
-    <% if (user) { %>
-      <a href="/productos" <% if (path.startsWith('/productos')) { %>aria-current="page"<% } %>>Productos</a>
-      <a href="/favoritos" <% if (path === '/favoritos') { %>aria-current="page"<% } %>>Mis favoritos</a>
-      <form method="post" action="/logout">
-        <input type="hidden" name="_csrf" value="<%= csrf() %>">
-        <button type="submit" class="btn btn-sm">Cerrar sesión</button>
-      </form>
-    <% } else { %>
-      <a href="/login" <% if (path === '/login') { %>aria-current="page"<% } %>>Iniciar sesión</a>
-      <a href="/registro" class="btn btn-sm btn-primary">Solicitar acceso</a>
-    <% } %>
+    <a href="/login" <% if (path === '/login') { %>aria-current="page"<% } %>>Iniciar sesión</a>
+    <a href="/registro" class="btn btn-sm btn-primary">Solicitar acceso</a>
   </nav>
 </header>
 <main id="contenido" class="container">

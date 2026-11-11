@@ -1,6 +1,30 @@
 <%- include('partials/head') %>
 <% const filtered = search || country; const base = onlyFavorites ? '/favoritos' : '/productos'; %>
-<h1><%= title %></h1>
+<div class="page-head">
+  <h1><%= title %></h1>
+  <% if (!onlyFavorites) { %>
+  <details class="dropdown" <%= openSuggest ? 'open' : '' %>>
+    <summary class="btn btn-primary">Sugerir producto</summary>
+    <form method="post" action="/sugerencias" class="dropdown-panel form">
+      <input type="hidden" name="_csrf" value="<%= csrf() %>">
+      <h2>Sugerir un producto</h2>
+      <p class="hint">¿Falta algún RUTF? Pega un enlace donde aparezca o rellena lo que sepas. Un administrador lo revisará.</p>
+      <label for="s-url">Enlace al producto</label>
+      <input id="s-url" name="url" type="url" maxlength="500" placeholder="https://…" autocomplete="off">
+      <p class="divider"><span>o rellena los datos</span></p>
+      <label for="s-name">Nombre del producto</label>
+      <input id="s-name" name="name" type="text" maxlength="300" autocomplete="off">
+      <label for="s-producer">Productor</label>
+      <input id="s-producer" name="producer" type="text" maxlength="150" autocomplete="off">
+      <label for="s-country">País de producción</label>
+      <input id="s-country" name="country" type="text" maxlength="100" autocomplete="off">
+      <label for="s-notes">Notas</label>
+      <textarea id="s-notes" name="notes" rows="3" maxlength="2000" placeholder="Composición, coste, fuente… lo que sepas"></textarea>
+      <button type="submit" class="btn btn-primary btn-block">Enviar sugerencia</button>
+    </form>
+  </details>
+  <% } %>
+</div>
 
 <form method="get" action="<%= base %>" class="filters" role="search">
   <div>
