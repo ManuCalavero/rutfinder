@@ -1,0 +1,11 @@
+<%- include('partials/head') %>
+<section class="box box-pad narrow">
+  <h1><%= title %></h1>
+  <p><%= text %></p>
+  <form method="post" action="<%= action %>" class="actions">
+    <input type="hidden" name="_csrf" value="<%= csrf() %>">
+    <button type="submit" class="btn btn-danger"><%= confirmLabel %></button>
+    <a class="btn" href="<%= cancelHref %>">Cancelar</a>
+  </form>
+</section>
+<%- include('partials/foot') %>

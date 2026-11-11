@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> · Rutfinder</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<% if (user && user.role === 'admin') { %>
+<% const initials = user.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase(); %>
+<% const at = (prefix) => (path.startsWith(prefix) ? 'aria-current="page"' : ''); %>
+<header class="appbar">
+  <a class="brand" href="/admin"><span class="logo" aria-hidden="true">R</span>Rutfinder</a>
+  <details class="profile">
+    <summary aria-label="Menú de perfil de <%= user.name %>"><span class="avatar" aria-hidden="true"><%= initials %></span></summary>
+    <div class="profile-menu">
+      <p class="profile-who"><strong><%= user.name %></strong><span><%= user.email %></span></p>
+      <a href="/admin/cuenta">Editar mis datos</a>
+      <a href="/admin/cuenta#password">Cambiar contraseña</a>
+      <a href="/admin/usuarios?nuevo=1">Añadir usuario</a>
+      <form method="post" action="/logout">
+        <input type="hidden" name="_csrf" value="<%= csrf() %>">
+        <button type="submit">Cerrar sesión</button>
+      </form>
+    </div>
+  </details>
+</header>
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <p class="sidebar-title nav-label">Administración</p>
+    <nav aria-label="Administración">
+      <a href="/admin" title="Solicitudes" <%- path === '/admin' || path.startsWith('/admin/usuarios/') ? 'aria-current="page"' : '' %>>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M5 5h14l2 8v6H3v-6z"/></svg>
+        <span class="nav-label">Solicitudes</span>
+        <span class="count<%= counts.pending ? ' count-alert' : '' %>"><%= counts.pending %><span class="sr-only"> pendientes</span></span>
+      </a>
+      <a href="/admin/productos" title="Productos" <%- at('/admin/productos') || at('/productos') %>>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
+        <span class="nav-label">Productos</span>
+        <span class="count"><%= counts.products %></span>
+      </a>
+      <a href="/admin/usuarios" title="Usuarios" <%- path === '/admin/usuarios' ? 'aria-current="page"' : '' %>>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.8a3.5 3.5 0 010 6.4M18 14.8c2 .7 3.5 2.4 3.5 5.2"/></svg>
+        <span class="nav-label">Usuarios</span>
+      </a>
+    </nav>
+    <button type="button" class="sidebar-toggle" data-toggle-sidebar aria-controls="sidebar" aria-expanded="true" title="Plegar o desplegar el menú">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5v14M20 12H9M13 7l-5 5 5 5"/></svg>
+      <span class="nav-label">Plegar menú</span>
+    </button>
+  </aside>
+  <div class="panel">
+    <p class="crumbs">Administración <span aria-hidden="true">/</span> <strong><%= title %></strong></p>
+    <main id="contenido" class="content">
+<% } else { %>
+<header class="header">
+  <a class="brand" href="/"><span class="logo" aria-hidden="true">R</span>Rutfinder</a>
+  <nav class="header-nav" aria-label="Principal">
+    <% if (user) { %>
+      <a href="/productos" <% if (path.startsWith('/productos')) { %>aria-current="page"<% } %>>Productos</a>
+      <a href="/favoritos" <% if (path === '/favoritos') { %>aria-current="page"<% } %>>Mis favoritos</a>
+      <form method="post" action="/logout">
+        <input type="hidden" name="_csrf" value="<%= csrf() %>">
+        <button type="submit" class="btn btn-sm">Cerrar sesión</button>
+      </form>
+    <% } else { %>
+      <a href="/login" <% if (path === '/login') { %>aria-current="page"<% } %>>Iniciar sesión</a>
+      <a href="/registro" class="btn btn-sm btn-primary">Solicitar acceso</a>
+    <% } %>
+  </nav>
+</header>
+<main id="contenido" class="container">
+<% } %>
+<% if (flash) { %>
+  <div class="flash flash-<%= flash.type %>" role="<%= flash.type === 'error' ? 'alert' : 'status' %>"><%= flash.text %></div>
+<% } %>

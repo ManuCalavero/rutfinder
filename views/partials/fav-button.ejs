@@ -1,0 +1,7 @@
+<form method="post" action="/favoritos/<%= product.id %>">
+  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+  <input type="hidden" name="volver" value="<%= here %>">
+  <button type="submit" class="btn btn-sm" aria-pressed="<%= product.favorite %>" aria-label="<%= product.favorite ? 'Quitar de favoritos' : 'Guardar en favoritos' %>: <%= product.name %>">
+    <span aria-hidden="true" class="<%= product.favorite ? 'star-on' : '' %>"><%= product.favorite ? '★' : '☆' %></span> <%= product.favorite ? 'Guardado' : 'Guardar' %>
+  </button>
+</form>

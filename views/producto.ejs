@@ -1,0 +1,27 @@
+<%- include('partials/head') %>
+<% const admin = user.role === 'admin'; %>
+<p><a href="<%= admin ? '/admin/productos' : '/productos' %>">← Volver a productos</a></p>
+<div class="page-head">
+  <h1><%= product.name %> <% if (product.hidden) { %><span class="label label-muted">Oculto</span><% } %></h1>
+  <div class="actions">
+    <% if (admin) { %>
+      <a class="btn" href="/admin/productos/<%= product.id %>/editar">Editar ficha</a>
+    <% } else { %>
+      <%- include('partials/fav-button', { product }) %>
+    <% } %>
+  </div>
+</div>
+
+<% if (!fields.length) { %>
+  <div class="box blankslate"><h2>Sin datos</h2><p>Esta ficha todavía no tiene campos.</p></div>
+<% } else { %>
+  <dl class="box sheet">
+    <% fields.forEach((field) => { const value = product.data[field]; %>
+      <div class="sheet-row">
+        <dt><%= field %></dt>
+        <% if (value) { %><dd><%- linkify(value) %></dd><% } else { %><dd class="muted">Sin datos</dd><% } %>
+      </div>
+    <% }) %>
+  </dl>
+<% } %>
+<%- include('partials/foot') %>

@@ -1,0 +1,22 @@
+<%- include('partials/head') %>
+<p><a href="/admin/productos">← Volver a productos</a></p>
+<h1><%= product.id ? 'Editar ficha' : 'Nuevo producto' %></h1>
+<% if (error) { %><div class="flash flash-error" role="alert"><%= error %></div><% } %>
+<% if (!fields.length) { %>
+  <div class="flash flash-warn" role="status">Aún no hay campos de ficha definidos. Se crean al <a href="/admin/productos">importar el Excel</a> desde Productos.</div>
+<% } %>
+<form method="post" action="<%= product.id ? `/admin/productos/${product.id}` : '/admin/productos' %>" class="box box-pad form">
+  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+  <label for="name">Nombre <span class="muted">(obligatorio)</span></label>
+  <input id="name" name="name" type="text" value="<%= product.name %>" maxlength="300" required>
+  <p class="hint">Los campos que dejes vacíos se mostrarán como «Sin datos».</p>
+  <% fields.forEach((field, i) => { %>
+    <label for="f<%= i %>"><%= field %></label>
+    <textarea id="f<%= i %>" name="f<%= i %>" rows="3"><%= product.data[field] || '' %></textarea>
+  <% }) %>
+  <div class="actions">
+    <button type="submit" class="btn btn-primary"><%= product.id ? 'Guardar cambios' : 'Crear producto' %></button>
+    <a class="btn" href="/admin/productos">Cancelar</a>
+  </div>
+</form>
+<%- include('partials/foot') %>

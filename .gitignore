@@ -1,0 +1,5 @@
+node_modules/
+.env
+# Datos de origen: no se publican ni se sirven. Se suben desde el panel de admin.
+private/
+.DS_Store

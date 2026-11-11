@@ -1,0 +1,30 @@
+<%- include('partials/head') %>
+<h1>Mi cuenta</h1>
+<div class="grid">
+  <form method="post" action="/admin/cuenta/perfil" class="box box-pad form">
+    <h2>Mis datos</h2>
+    <input type="hidden" name="_csrf" value="<%= csrf() %>">
+    <label for="name">Nombre</label>
+    <input id="name" name="name" type="text" value="<%= profile.name %>" maxlength="100" autocomplete="name" required>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" value="<%= profile.email %>" maxlength="254" autocomplete="email" aria-describedby="email-help" required>
+    <p id="email-help" class="hint">Es el email con el que inicias sesión.</p>
+    <label for="organization">Organización</label>
+    <input id="organization" name="organization" type="text" value="<%= profile.organization %>" maxlength="150" autocomplete="organization" required>
+    <div class="actions"><button type="submit" class="btn btn-primary">Guardar datos</button></div>
+  </form>
+
+  <form method="post" action="/admin/cuenta/password" class="box box-pad form" id="password">
+    <h2>Cambiar contraseña</h2>
+    <input type="hidden" name="_csrf" value="<%= csrf() %>">
+    <label for="current">Contraseña actual</label>
+    <input id="current" name="current" type="password" autocomplete="current-password" required>
+    <label for="new-password">Contraseña nueva</label>
+    <input id="new-password" name="password" type="password" minlength="12" maxlength="72" autocomplete="new-password" aria-describedby="new-password-help" required>
+    <p id="new-password-help" class="hint">Mínimo 12 caracteres.</p>
+    <label for="repeat">Repite la contraseña nueva</label>
+    <input id="repeat" name="repeat" type="password" minlength="12" maxlength="72" autocomplete="new-password" required>
+    <div class="actions"><button type="submit" class="btn btn-primary">Cambiar contraseña</button></div>
+  </form>
+</div>
+<%- include('partials/foot') %>

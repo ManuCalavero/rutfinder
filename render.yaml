@@ -1,0 +1,28 @@
+# Blueprint de Render: una aplicación web + una base de datos PostgreSQL.
+databases:
+  - name: rutfinder-db
+    plan: free
+
+services:
+  - type: web
+    name: rutfinder
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rutfinder-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      # Render te pedirá estos dos valores al crear el Blueprint; no se guardan en el repositorio.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

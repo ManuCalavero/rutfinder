@@ -1,0 +1,89 @@
+<%- include('partials/head') %>
+<% const filtered = search || country || state !== 'all'; %>
+<div class="page-head">
+  <h1>Productos</h1>
+  <div class="actions">
+    <details class="dropdown">
+      <summary class="btn">Importar Excel</summary>
+      <form method="post" action="/admin/productos/importar" enctype="multipart/form-data" class="dropdown-panel form">
+        <input type="hidden" name="_csrf" value="<%= csrf() %>">
+        <label for="archivo">Archivo Excel (.xlsx)</label>
+        <input id="archivo" name="archivo" type="file" accept=".xlsx" aria-describedby="archivo-help" required>
+        <p id="archivo-help" class="hint">Se leen los productos de la hoja «RUTF»: la primera fila son los campos y la primera columna, el nombre. Antes de guardar verás una vista previa. El archivo no se almacena en el servidor.</p>
+        <button type="submit" class="btn btn-primary btn-block">Subir y ver vista previa</button>
+      </form>
+    </details>
+    <a class="btn btn-primary" href="/admin/productos/nuevo">Nuevo producto</a>
+  </div>
+</div>
+
+<% if (pendingImport) { %>
+  <div class="flash flash-warn" role="status">Tienes una importación de Excel sin confirmar. <a href="/admin/productos/importar">Ver vista previa</a></div>
+<% } %>
+
+<form method="get" action="/admin/productos" class="filters" role="search">
+  <div>
+    <label for="q">Buscar</label>
+    <input id="q" name="q" type="search" value="<%= search %>" maxlength="100" placeholder="Nombre, productor, ingrediente…">
+  </div>
+  <div>
+    <label for="pais">País de producción</label>
+    <select id="pais" name="pais">
+      <option value="">Todos los países</option>
+      <% countries.forEach((c) => { %><option value="<%= c %>" <%= c === country ? 'selected' : '' %>><%= c %></option><% }) %>
+    </select>
+  </div>
+  <div class="filter-sm">
+    <label for="estado">Estado</label>
+    <select id="estado" name="estado">
+      <option value="">Todos</option>
+      <option value="visible" <%= state === 'visible' ? 'selected' : '' %>>Visibles</option>
+      <option value="hidden" <%= state === 'hidden' ? 'selected' : '' %>>Ocultos</option>
+    </select>
+  </div>
+  <button type="submit" class="btn">Filtrar</button>
+  <% if (filtered) { %><a href="/admin/productos">Limpiar filtros</a><% } %>
+</form>
+
+<% if (!products.length) { %>
+  <div class="box blankslate">
+    <% if (filtered) { %>
+      <h2>Ningún producto coincide con los filtros</h2>
+      <p><a href="/admin/productos">Limpiar filtros</a></p>
+    <% } else { %>
+      <h2>Todavía no hay productos</h2>
+      <p>Usa «Importar Excel» o crea un producto nuevo.</p>
+    <% } %>
+  </div>
+<% } else { %>
+  <p class="muted" role="status"><%= products.length %> <%= products.length === 1 ? 'producto' : 'productos' %></p>
+  <div class="box table-wrap">
+    <table>
+      <thead>
+        <tr><th scope="col">Nombre</th><th scope="col" class="hide-sm">Productor</th><th scope="col" class="hide-sm">País de producción</th><th scope="col">Estado</th><th scope="col"><span class="sr-only">Acciones</span></th></tr>
+      </thead>
+      <tbody>
+        <% products.forEach((p) => { %>
+          <tr>
+            <th scope="row"><a href="/productos/<%= p.id %>"><%= p.name %></a></th>
+            <td class="hide-sm"><%= p.producer || 'Sin datos' %></td>
+            <td class="hide-sm"><%= countries_text(p.location) %></td>
+            <td><span class="label <%= p.hidden ? 'label-muted' : 'label-success' %>"><%= p.hidden ? 'Oculto' : 'Visible' %></span></td>
+            <td class="cell-actions">
+              <a class="btn btn-sm" href="/admin/productos/<%= p.id %>/editar" aria-label="Editar <%= p.name %>">Editar</a>
+              <% if (p.hidden) { %>
+                <form method="post" action="/admin/productos/<%= p.id %>/mostrar">
+                  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+                  <button type="submit" class="btn btn-sm" aria-label="Mostrar <%= p.name %>">Mostrar</button>
+                </form>
+              <% } else { %>
+                <a class="btn btn-sm btn-danger" href="/admin/productos/<%= p.id %>/ocultar" aria-label="Ocultar <%= p.name %>">Ocultar</a>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+<%- include('partials/foot') %>

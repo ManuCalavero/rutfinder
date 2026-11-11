@@ -1,0 +1,21 @@
+<%- include('partials/head') %>
+<section class="narrow">
+  <h1 class="center">Solicitar acceso</h1>
+  <p class="muted center">Un administrador revisará tu solicitud antes de darte acceso.</p>
+  <% if (error) { %><div class="flash flash-error" role="alert"><%= error %></div><% } %>
+  <form method="post" action="/registro" class="box box-pad form">
+    <input type="hidden" name="_csrf" value="<%= csrf() %>">
+    <label for="name">Nombre</label>
+    <input id="name" name="name" type="text" value="<%= values.name || '' %>" maxlength="100" autocomplete="name" required>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" value="<%= values.email || '' %>" maxlength="254" autocomplete="email" required>
+    <label for="organization">Organización</label>
+    <input id="organization" name="organization" type="text" value="<%= values.organization || '' %>" maxlength="150" autocomplete="organization" required>
+    <label for="password">Contraseña</label>
+    <input id="password" name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" aria-describedby="password-help" required>
+    <p id="password-help" class="hint">Mínimo 8 caracteres.</p>
+    <button type="submit" class="btn btn-primary btn-block">Enviar solicitud</button>
+  </form>
+  <p class="box box-pad center">¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>.</p>
+</section>
+<%- include('partials/foot') %>

@@ -1,0 +1,61 @@
+<%- include('partials/head') %>
+<% const filtered = search || country; const base = onlyFavorites ? '/favoritos' : '/productos'; %>
+<h1><%= title %></h1>
+
+<form method="get" action="<%= base %>" class="filters" role="search">
+  <div>
+    <label for="q">Buscar</label>
+    <input id="q" name="q" type="search" value="<%= search %>" maxlength="100" placeholder="Nombre, productor, ingrediente…">
+  </div>
+  <div>
+    <label for="pais">País de producción</label>
+    <select id="pais" name="pais">
+      <option value="">Todos los países</option>
+      <% countries.forEach((c) => { %><option value="<%= c %>" <%= c === country ? 'selected' : '' %>><%= c %></option><% }) %>
+    </select>
+  </div>
+  <button type="submit" class="btn">Filtrar</button>
+  <% if (filtered) { %><a href="<%= base %>">Limpiar filtros</a><% } %>
+</form>
+
+<% if (!products.length) { %>
+  <div class="box blankslate">
+    <% if (filtered) { %>
+      <h2>Ningún producto coincide con tu búsqueda</h2>
+      <p><a href="<%= base %>">Limpiar filtros</a></p>
+    <% } else if (onlyFavorites) { %>
+      <h2>Aún no tienes favoritos</h2>
+      <p>Guarda productos desde la <a href="/productos">tabla de productos</a> para tenerlos a mano aquí.</p>
+    <% } else { %>
+      <h2>Todavía no hay productos</h2>
+      <p>Cuando el administrador publique productos aparecerán aquí.</p>
+    <% } %>
+  </div>
+<% } else { %>
+  <p class="muted" role="status"><%= products.length %> <%= products.length === 1 ? 'producto' : 'productos' %></p>
+  <div class="box table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Nombre</th>
+          <th scope="col">Productor</th>
+          <th scope="col" class="hide-sm">Tipo de producción</th>
+          <th scope="col">País de producción</th>
+          <th scope="col"><span class="sr-only">Favorito</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% products.forEach((product) => { %>
+          <tr>
+            <th scope="row"><a href="/productos/<%= product.id %>"><%= product.name %></a></th>
+            <td><%= product.producer || 'Sin datos' %></td>
+            <td class="hide-sm"><%= product.type || 'Sin datos' %></td>
+            <td><%= countries_text(product.location) %></td>
+            <td class="cell-actions"><%- include('partials/fav-button', { product }) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+<%- include('partials/foot') %>

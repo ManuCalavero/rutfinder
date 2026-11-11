@@ -1,0 +1,31 @@
+<%- include('partials/head') %>
+<h1>Solicitudes de registro</h1>
+<% if (!requests.length) { %>
+  <div class="box blankslate"><h2>No hay solicitudes pendientes</h2><p>Las nuevas solicitudes de registro aparecerán aquí.</p></div>
+<% } else { %>
+  <div class="box table-wrap">
+    <table>
+      <thead>
+        <tr><th scope="col">Nombre</th><th scope="col">Email</th><th scope="col">Organización</th><th scope="col" class="hide-sm">Fecha</th><th scope="col"><span class="sr-only">Acciones</span></th></tr>
+      </thead>
+      <tbody>
+        <% requests.forEach((r) => { %>
+          <tr>
+            <th scope="row"><%= r.name %></th>
+            <td><%= r.email %></td>
+            <td><%= r.organization %></td>
+            <td class="hide-sm"><%= fecha(r.created_at) %></td>
+            <td class="cell-actions">
+              <form method="post" action="/admin/usuarios/<%= r.id %>/aprobar">
+                <input type="hidden" name="_csrf" value="<%= csrf() %>">
+                <button type="submit" class="btn btn-sm btn-primary" aria-label="Aprobar a <%= r.name %>">Aprobar</button>
+              </form>
+              <a class="btn btn-sm btn-danger" href="/admin/usuarios/<%= r.id %>/rechazar" aria-label="Rechazar a <%= r.name %>">Rechazar</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+<%- include('partials/foot') %>

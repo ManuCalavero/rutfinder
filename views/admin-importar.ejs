@@ -1,0 +1,42 @@
+<%- include('partials/head') %>
+<% const nuevos = preview.rows.filter((r) => !r.id).length; const actualizados = preview.rows.length - nuevos; %>
+<h1>Vista previa de la importación</h1>
+<div class="flash flash-warn" role="status">
+  Todavía no se ha guardado nada. Se han detectado <strong><%= preview.rows.length %> productos</strong> y <strong><%= preview.fields.length %> campos</strong>:
+  <%= nuevos %> nuevos y <%= actualizados %> que ya existen y se actualizarán con los datos del Excel (se pierden los cambios hechos a mano en esas fichas).
+  Los productos que no están en el Excel no se tocan.
+  <% if (preview.skipped) { %><br>Se han omitido <%= preview.skipped %> filas sin nombre.<% } %>
+</div>
+<div class="actions">
+  <form method="post" action="/admin/productos/importar/confirmar">
+    <input type="hidden" name="_csrf" value="<%= csrf() %>">
+    <button type="submit" class="btn btn-primary">Confirmar y guardar</button>
+  </form>
+  <form method="post" action="/admin/productos/importar/cancelar">
+    <input type="hidden" name="_csrf" value="<%= csrf() %>">
+    <button type="submit" class="btn">Cancelar</button>
+  </form>
+</div>
+<details class="box box-pad">
+  <summary>Campos detectados (<%= preview.fields.length %>)</summary>
+  <ul><% preview.fields.forEach((f) => { %><li><%= f %></li><% }) %></ul>
+</details>
+<div class="box table-wrap">
+  <table>
+    <thead>
+      <tr><th scope="col">Nombre</th><th scope="col">Productor</th><th scope="col">País de producción</th><th scope="col" class="hide-sm">Campos con datos</th><th scope="col">Acción</th></tr>
+    </thead>
+    <tbody>
+      <% preview.rows.forEach((r) => { %>
+        <tr>
+          <th scope="row"><%= r.name %></th>
+          <td><%= r.data['Producer'] || 'Sin datos' %></td>
+          <td><%= countries_text(r.data['Production location']) %></td>
+          <td class="hide-sm"><%= Object.keys(r.data).length %> de <%= preview.fields.length %></td>
+          <td><span class="label <%= r.id ? 'label-muted' : 'label-success' %>"><%= r.id ? 'Se actualiza' : 'Nuevo' %></span></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<%- include('partials/foot') %>
