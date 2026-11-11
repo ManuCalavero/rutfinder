@@ -49,7 +49,7 @@
       <p><a href="<%= base %>">Limpiar filtros</a></p>
     <% } else if (onlyFavorites) { %>
       <h2>Aún no tienes favoritos</h2>
-      <p>Guarda productos desde la <a href="/productos">tabla de productos</a> para tenerlos a mano aquí.</p>
+      <p>Guarda productos desde el <a href="/productos">catálogo de productos</a> para tenerlos a mano aquí.</p>
     <% } else { %>
       <h2>Todavía no hay productos</h2>
       <p>Cuando el administrador publique productos aparecerán aquí.</p>
@@ -57,29 +57,27 @@
   </div>
 <% } else { %>
   <p class="muted" role="status"><%= products.length %> <%= products.length === 1 ? 'producto' : 'productos' %></p>
-  <div class="box table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">Nombre</th>
-          <th scope="col">Productor</th>
-          <th scope="col" class="hide-sm">Tipo de producción</th>
-          <th scope="col">País de producción</th>
-          <th scope="col"><span class="sr-only">Favorito</span></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% products.forEach((product) => { %>
-          <tr>
-            <th scope="row"><a href="/productos/<%= product.id %>"><%= product.name %></a></th>
-            <td><%= product.producer || 'Sin datos' %></td>
-            <td class="hide-sm"><% const tb = typeBadge(product.type); %><% if (tb) { %><span class="badge badge-<%= tb.tone %>"><%= tb.text %></span><% } else { %><span class="muted">Sin datos</span><% } %></td>
-            <td><%= countries_text(product.location) %></td>
-            <td class="cell-actions"><%- include('partials/fav-button', { product }) %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+  <div class="products-grid">
+    <% products.forEach((product) => { %>
+      <article class="product-card">
+        <div class="product-card-inner">
+          <div class="product-card-head">
+            <h3><a href="/productos/<%= product.id %>"><%= product.name %></a></h3>
+            <% if (product.producer) { %><p class="product-card-producer"><%= product.producer %></p><% } %>
+          </div>
+          <div class="product-card-badges">
+            <% const tb = typeBadge(product.type); %>
+            <% if (tb) { %><span class="badge badge-<%= tb.tone %>"><%= tb.text %></span><% } %>
+          </div>
+          <% if (product.location) { %>
+            <p class="product-card-location"><%= countries_text(product.location) %></p>
+          <% } %>
+        </div>
+        <div class="product-card-action">
+          <%- include('partials/fav-button', { product }) %>
+        </div>
+      </article>
+    <% }) %>
   </div>
 <% } %>
 <%- include('partials/foot') %>
