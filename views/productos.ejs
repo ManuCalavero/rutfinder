@@ -73,7 +73,7 @@
           <tr>
             <th scope="row"><a href="/productos/<%= product.id %>"><%= product.name %></a></th>
             <td><%= product.producer || 'Sin datos' %></td>
-            <td class="hide-sm"><%= product.type || 'Sin datos' %></td>
+            <td class="hide-sm"><% const tb = typeBadge(product.type); %><% if (tb) { %><span class="badge badge-<%= tb.tone %>"><%= tb.text %></span><% } else { %><span class="muted">Sin datos</span><% } %></td>
             <td><%= countries_text(product.location) %></td>
             <td class="cell-actions"><%- include('partials/fav-button', { product }) %></td>
           </tr>

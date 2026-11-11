@@ -3,12 +3,29 @@ const multer = require('multer');
 const ExcelJS = require('exceljs');
 const bcrypt = require('bcryptjs');
 const { pool, q, getFields, findProducts, listCountries, readFilters } = require('./db');
+const { groupFields } = require('./fields');
 
 const SHEET = 'RUTF';
 // El Excel se procesa en memoria: nunca se escribe en el disco del servidor.
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 1 } }).single('archivo');
 
 const clean = (value) => String(value ?? '').replace(/\r\n?/g, '\n').trim();
+
+// Texto de una celda. Las celdas con hipervínculo o texto enriquecido no se leen bien con cell.text
+// (salía "[object Object]"): se guarda el texto visible y, debajo, la URL del enlace.
+function cellText(cell) {
+  const v = cell.value;
+  if (!v || typeof v !== 'object' || v instanceof Date) return clean(cell.text);
+  const rich = (x) => (x && typeof x === 'object' && Array.isArray(x.richText) ? x.richText.map((r) => r.text).join('') : x);
+  if (v.richText) return clean(rich(v));
+  if (v.hyperlink) {
+    const text = clean(rich(v.text));
+    const url = clean(v.hyperlink).replace(/^mailto:/i, '');
+    return text && text !== url ? `${text}\n${url}` : url;
+  }
+  if ('result' in v) return clean(rich(v.result));
+  return clean(cell.text);
+}
 
 // Lee la hoja "RUTF": la fila 1 son los nombres de los campos y la primera columna, el nombre del producto.
 async function parseExcel(buffer) {
@@ -19,7 +36,7 @@ async function parseExcel(buffer) {
 
   const headers = {}; // número de columna -> nombre del campo
   sheet.getRow(1).eachCell((cell, col) => {
-    const header = clean(cell.text);
+    const header = cellText(cell);
     if (col > 1 && header && !Object.values(headers).includes(header)) headers[col] = header;
   });
   const fields = Object.values(headers);
@@ -29,10 +46,10 @@ async function parseExcel(buffer) {
   let skipped = 0;
   sheet.eachRow((row, rowNumber) => {
     if (rowNumber === 1) return;
-    const name = clean(row.getCell(1).text);
+    const name = cellText(row.getCell(1));
     const data = {};
     row.eachCell((cell, col) => {
-      const value = clean(cell.text);
+      const value = cellText(cell);
       if (headers[col] && value) data[headers[col]] = value; // las celdas vacías no se guardan: se verán como "Sin datos"
     });
     if (name) rows.push({ name, data });
@@ -201,7 +218,7 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
   const renderForm = async (res, product, error = null, status = 200) =>
     res.status(status).render('admin-producto-form', {
       title: product.id ? `Editar ${product.name}` : 'Nuevo producto',
-      product, fields: await getFields(), error,
+      product, groups: groupFields(await getFields(), product.data), error,
     });
 
   router.get('/productos/nuevo', (req, res) => renderForm(res, { id: null, name: '', data: {} }));
@@ -326,3 +343,5 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
 
   return router;
 };
+
+module.exports.parseExcel = parseExcel; // para comprobar el Excel desde la línea de comandos

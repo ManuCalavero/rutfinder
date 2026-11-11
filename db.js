@@ -65,8 +65,11 @@ async function ensureAdmin() {
     return;
   }
   if (password.length < 12 || password.length > 72) {
-    console.warn('AVISO: ADMIN_PASSWORD debe tener entre 12 y 72 caracteres; no se sincroniza la contraseña del admin.');
+    console.warn(`AVISO: ADMIN_PASSWORD tiene ${password.length} caracteres y debe tener entre 12 y 72; no se crea ni se actualiza el admin ${email}.`);
     return;
+  }
+  if (/^\s|\s$|^["']|["']$/.test(password)) {
+    console.warn('AVISO: ADMIN_PASSWORD empieza o acaba con un espacio o unas comillas; forman parte de la contraseña. Quítalos si no los querías.');
   }
   await q(
     `INSERT INTO users (name, email, password_hash, organization, role, status)
@@ -74,6 +77,7 @@ async function ensureAdmin() {
      ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, role = 'admin', status = 'approved'`,
     [email, await bcrypt.hash(password, 12)]
   );
+  console.log(`Administrador listo: ${email} (contraseña tomada de ADMIN_PASSWORD).`);
 }
 
 async function init() {

@@ -1,27 +1,99 @@
 <%- include('partials/head') %>
 <% const admin = user.role === 'admin'; %>
-<p><a href="<%= admin ? '/admin/productos' : '/productos' %>">← Volver a productos</a></p>
-<div class="page-head">
-  <h1><%= product.name %> <% if (product.hidden) { %><span class="label label-muted">Oculto</span><% } %></h1>
+<% const short = (text, max) => { const t = String(text).replace(/\s+/g, ' ').trim(); return t.length > max ? t.slice(0, max).replace(/\s+\S*$/, '') + '…' : t; }; %>
+<% // Listas tipo «Calcium: 300–600 mg» (una por línea) se muestran como una tabla de dos columnas.
+   const rowsOf = (value) => {
+     const lines = String(value).split('\n').map((l) => l.trim()).filter(Boolean);
+     const rows = lines.map((l) => l.match(/^[•\-–]?\s*([^:]{2,48}):\s*(.+)$/)).filter(Boolean);
+     return lines.length >= 3 && rows.length >= lines.length * 0.7 ? rows.map((m) => [m[1], m[2]]) : null;
+   }; %>
+<% // Lo que ya se ve completo en las tarjetas de resumen no se repite en su sección.
+   const shownAbove = (i) => i.label === 'Lugar de producción' || (i.label === 'Productor' && facts.producer.replace(/\s+/g, ' ').trim().length <= 70); %>
+<a class="back" href="<%= admin ? '/admin/productos' : '/productos' %>"><%- icon('back') %> Productos</a>
+
+<header class="product-head">
+  <div class="product-title">
+    <div class="badges">
+      <% badges.forEach((b) => { %><span class="badge badge-<%= b.tone %>"><%- icon(b.icon) %><%= b.text %></span><% }) %>
+      <% if (product.hidden) { %><span class="badge badge-gray">Oculto</span><% } %>
+    </div>
+    <h1><%= product.name %></h1>
+    <% if (facts.producer || facts.countries.length) { %>
+      <p class="product-sub"><%= [short(facts.producer, 90), facts.countries.join(', ')].filter(Boolean).join(' · ') %></p>
+    <% } %>
+  </div>
   <div class="actions">
+    <% if (source) { %><a class="btn" href="<%= source %>" target="_blank" rel="noopener noreferrer nofollow"><%- icon('external') %> Ver fuente</a><% } %>
     <% if (admin) { %>
-      <a class="btn" href="/admin/productos/<%= product.id %>/editar">Editar ficha</a>
+      <a class="btn btn-primary" href="/admin/productos/<%= product.id %>/editar">Editar ficha</a>
     <% } else { %>
       <%- include('partials/fav-button', { product }) %>
     <% } %>
   </div>
-</div>
+</header>
 
-<% if (!fields.length) { %>
+<section class="facts" aria-label="Resumen">
+  <div class="fact">
+    <p class="fact-label"><%- icon('user') %> Productor</p>
+    <p class="fact-value" title="<%= facts.producer %>"><%= facts.producer ? short(facts.producer, 70) : 'Sin datos' %></p>
+  </div>
+  <div class="fact">
+    <p class="fact-label"><%- icon('pin') %> Lugar de producción</p>
+    <% if (facts.countries.length) { %>
+      <p class="chips"><% facts.countries.forEach((c) => { %><span class="chip"><%= c %></span><% }) %></p>
+    <% } else { %><p class="fact-value muted">Sin datos</p><% } %>
+  </div>
+  <div class="fact">
+    <p class="fact-label"><%- icon('clock') %> Vida útil</p>
+    <p class="fact-value fact-small <%= facts.shelf ? '' : 'muted' %>"><%= facts.shelf ? short(facts.shelf, 80) : 'Sin datos' %></p>
+  </div>
+  <div class="fact">
+    <p class="fact-label"><%- icon('chart') %> Datos disponibles</p>
+    <p class="fact-value"><strong class="fact-big"><%= filled %></strong> <span class="muted">de <%= total %> campos</span></p>
+    <div class="meter" role="img" aria-label="<%= filled %> de <%= total %> campos con datos"><span style="width: <%= total ? Math.round(filled / total * 100) : 0 %>%"></span></div>
+  </div>
+</section>
+
+<% if (!groups.length) { %>
   <div class="box blankslate"><h2>Sin datos</h2><p>Esta ficha todavía no tiene campos.</p></div>
 <% } else { %>
-  <dl class="box sheet">
-    <% fields.forEach((field) => { const value = product.data[field]; %>
-      <div class="sheet-row">
-        <dt><%= field %></dt>
-        <% if (value) { %><dd><%- linkify(value) %></dd><% } else { %><dd class="muted">Sin datos</dd><% } %>
-      </div>
+<div class="product-layout">
+  <div class="product-sections">
+    <% groups.forEach((g) => { %>
+      <section class="box section" id="<%= g.id %>" aria-labelledby="t-<%= g.id %>">
+        <div class="section-head">
+          <span class="section-icon"><%- icon(g.id) %></span>
+          <h2 id="t-<%= g.id %>"><%= g.title %></h2>
+          <span class="section-count"><%= g.filled %>/<%= g.total %></span>
+        </div>
+        <% if (g.filled) { %>
+          <div class="fields">
+            <% g.items.filter((i) => i.value && !shownAbove(i)).forEach((i) => { const est = /^\(estimated\)\s*/i.test(i.value); const value = i.value.replace(/^\(estimated\)\s*/i, ''); const rows = rowsOf(value); %>
+              <div class="field<%= i.half ? ' field-half' : '' %>">
+                <h3><%= i.label %><% if (est) { %> <span class="badge badge-amber badge-xs">Estimado</span><% } %></h3>
+                <% if (rows) { %>
+                  <table class="kv"><tbody>
+                    <% rows.forEach(([k, v]) => { %><tr><th scope="row"><%= k %></th><td><%- linkify(v) %></td></tr><% }) %>
+                  </tbody></table>
+                <% } else { %>
+                  <div class="field-value"><%- linkify(value) %></div>
+                <% } %>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+        <% if (g.empty.length) { %>
+          <p class="empty-note"><strong>Sin datos:</strong> <%= g.empty.join(', ') %></p>
+        <% } %>
+      </section>
     <% }) %>
-  </dl>
+  </div>
+  <nav class="toc" aria-label="Secciones de la ficha">
+    <p class="toc-title">En esta ficha</p>
+    <% groups.forEach((g) => { %>
+      <a href="#<%= g.id %>" class="<%= g.filled ? '' : 'toc-empty' %>"><%- icon(g.id) %><span><%= g.title %></span><span class="toc-count"><%= g.filled %>/<%= g.total %></span></a>
+    <% }) %>
+  </nav>
+</div>
 <% } %>
 <%- include('partials/foot') %>

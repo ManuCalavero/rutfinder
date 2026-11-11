@@ -1,22 +1,47 @@
 <%- include('partials/head') %>
-<p><a href="/admin/productos">← Volver a productos</a></p>
+<a class="back" href="<%= product.id ? `/productos/${product.id}` : '/admin/productos' %>"><%- icon('back') %> <%= product.id ? 'Volver a la ficha' : 'Productos' %></a>
 <h1><%= product.id ? 'Editar ficha' : 'Nuevo producto' %></h1>
 <% if (error) { %><div class="flash flash-error" role="alert"><%= error %></div><% } %>
-<% if (!fields.length) { %>
+<% if (!groups.length) { %>
   <div class="flash flash-warn" role="status">Aún no hay campos de ficha definidos. Se crean al <a href="/admin/productos">importar el Excel</a> desde Productos.</div>
 <% } %>
-<form method="post" action="<%= product.id ? `/admin/productos/${product.id}` : '/admin/productos' %>" class="box box-pad form">
+<form method="post" action="<%= product.id ? `/admin/productos/${product.id}` : '/admin/productos' %>" class="form product-form">
   <input type="hidden" name="_csrf" value="<%= csrf() %>">
-  <label for="name">Nombre <span class="muted">(obligatorio)</span></label>
-  <input id="name" name="name" type="text" value="<%= product.name %>" maxlength="300" required>
-  <p class="hint">Los campos que dejes vacíos se mostrarán como «Sin datos».</p>
-  <% fields.forEach((field, i) => { %>
-    <label for="f<%= i %>"><%= field %></label>
-    <textarea id="f<%= i %>" name="f<%= i %>" rows="3"><%= product.data[field] || '' %></textarea>
-  <% }) %>
-  <div class="actions">
+  <div class="box box-pad">
+    <label for="name">Nombre del producto <span class="muted">(obligatorio)</span></label>
+    <input id="name" name="name" type="text" value="<%= product.name %>" maxlength="300" required>
+    <p class="hint">Los campos que dejes vacíos se mostrarán como «Sin datos». Puedes cambiar de pestaña sin perder lo escrito: todo se guarda a la vez.</p>
+  </div>
+
+  <% if (groups.length) { %>
+  <div class="box tabs" data-tabs>
+    <div class="tab-list" role="tablist" aria-label="Grupos de campos" hidden>
+      <% groups.forEach((g, n) => { %>
+        <button type="button" role="tab" id="tab-<%= g.id %>" aria-controls="panel-<%= g.id %>" aria-selected="<%= n === 0 %>" tabindex="<%= n === 0 ? 0 : -1 %>">
+          <%- icon(g.id) %><span><%= g.title %></span><span class="tab-count"><%= g.filled %>/<%= g.total %></span>
+        </button>
+      <% }) %>
+    </div>
+    <% groups.forEach((g) => { %>
+      <fieldset class="tab-panel" role="tabpanel" id="panel-<%= g.id %>" aria-labelledby="tab-<%= g.id %>">
+        <legend><%= g.title %></legend>
+        <div class="fields">
+          <% g.items.forEach((i) => { const lines = i.value.split('\n').length + Math.ceil(i.value.length / 90); %>
+            <div class="field<%= i.half ? ' field-half' : '' %>">
+              <label for="f<%= i.index %>"><%= i.label %></label>
+              <textarea id="f<%= i.index %>" name="f<%= i.index %>" rows="<%= Math.min(14, Math.max(2, lines)) %>" aria-describedby="h<%= i.index %>"><%= i.value %></textarea>
+              <p class="hint" id="h<%= i.index %>">Columna del Excel: «<%= i.name %>»</p>
+            </div>
+          <% }) %>
+        </div>
+      </fieldset>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <div class="form-bar">
     <button type="submit" class="btn btn-primary"><%= product.id ? 'Guardar cambios' : 'Crear producto' %></button>
-    <a class="btn" href="/admin/productos">Cancelar</a>
+    <a class="btn" href="<%= product.id ? `/productos/${product.id}` : '/admin/productos' %>">Cancelar</a>
   </div>
 </form>
 <%- include('partials/foot') %>

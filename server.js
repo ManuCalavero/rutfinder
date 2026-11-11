@@ -8,6 +8,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
 const { pool, q, init, getFields, findProducts, listCountries, readFilters } = require('./db');
+const { groupFields, badges, typeBadge, firstUrl, pick, icon } = require('./fields');
 
 const PROD = process.env.NODE_ENV === 'production';
 if (!process.env.DATABASE_URL || (process.env.SESSION_SECRET || '').length < 32) {
@@ -44,6 +45,8 @@ app.locals.linkify = (text) => String(text)
   .join('');
 app.locals.countries_text = (value) => (value || '').split('\n').map((s) => s.trim()).filter(Boolean).join(', ') || 'Sin datos';
 app.locals.fecha = (d) => new Date(d).toLocaleDateString('es-ES');
+app.locals.typeBadge = typeBadge;
+app.locals.icon = icon;
 
 const message = (res, status, title, text) => res.status(status).render('mensaje', { title, text });
 const notFound = (res) => message(res, 404, 'Página no encontrada', 'La página que buscas no existe o no tienes acceso a ella.');
@@ -176,7 +179,19 @@ app.get('/productos/:id', requireUser, async (req, res) => {
     [req.params.id, req.user.id, isAdmin(req)]
   )).rows[0];
   if (!product) return notFound(res);
-  res.render('producto', { title: product.name, product, fields: await getFields(), here: req.originalUrl });
+  const fields = await getFields();
+  const groups = groupFields(fields, product.data);
+  const filled = groups.reduce((n, g) => n + g.filled, 0);
+  res.render('producto', {
+    title: product.name, product, groups, filled, total: fields.length, here: req.originalUrl,
+    badges: badges(product.data), source: firstUrl(product.data),
+    facts: {
+      producer: pick(product.data, 'Producer'),
+      countries: String(pick(product.data, 'Production location')).split('\n').map((c) => c.trim()).filter(Boolean),
+      shelf: pick(product.data, 'Shelf Life'),
+      cost: pick(product.data, 'Cost'),
+    },
+  });
 });
 
 app.post('/favoritos/:id', requireMember, async (req, res) => {
