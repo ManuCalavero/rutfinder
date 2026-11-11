@@ -8,8 +8,8 @@
 <form method="post" action="<%= product.id ? `/admin/productos/${product.id}` : '/admin/productos' %>" class="form product-form">
   <input type="hidden" name="_csrf" value="<%= csrf() %>">
   <div class="box box-pad">
-    <label for="name">Nombre del producto <span class="muted">(obligatorio)</span></label>
-    <input id="name" name="name" type="text" value="<%= product.name %>" maxlength="300" required>
+    <label for="name">Nombre del producto</label>
+    <input id="name" name="name" type="text" value="<%= product.name %>" maxlength="300">
     <p class="hint">Los campos que dejes vacíos se mostrarán como «Sin datos». Puedes cambiar de pestaña sin perder lo escrito: todo se guarda a la vez.</p>
   </div>
 

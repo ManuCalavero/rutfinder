@@ -2,9 +2,18 @@
 <% const filtered = search || country; const base = onlyFavorites ? '/favoritos' : '/productos'; %>
 <div class="page-head">
   <h1><%= title %></h1>
-  <% if (!onlyFavorites) { %>
-  <details class="dropdown" <%= openSuggest ? 'open' : '' %>>
-    <summary class="btn btn-primary">Sugerir producto</summary>
+  <div class="page-head-actions">
+    <% if (products && products.length) { %>
+      <button class="view-toggle" data-toggle-view="grid" title="Vista de cards">
+        <%- icon('grid') %>
+      </button>
+      <button class="view-toggle" data-toggle-view="table" title="Vista de tabla">
+        <%- icon('table') %>
+      </button>
+    <% } %>
+    <% if (!onlyFavorites) { %>
+    <details class="dropdown" <%= openSuggest ? 'open' : '' %>>
+      <summary class="btn btn-primary">Sugerir producto</summary>
     <form method="post" action="/sugerencias" class="dropdown-panel form">
       <input type="hidden" name="_csrf" value="<%= csrf() %>">
       <h2>Sugerir un producto</h2>
@@ -23,7 +32,8 @@
       <button type="submit" class="btn btn-primary btn-block">Enviar sugerencia</button>
     </form>
   </details>
-  <% } %>
+    <% } %>
+  </div>
 </div>
 
 <form method="get" action="<%= base %>" class="filters" role="search">
@@ -57,27 +67,57 @@
   </div>
 <% } else { %>
   <p class="muted" role="status"><%= products.length %> <%= products.length === 1 ? 'producto' : 'productos' %></p>
-  <div class="products-grid">
-    <% products.forEach((product) => { %>
-      <article class="product-card">
-        <div class="product-card-inner">
-          <div class="product-card-head">
-            <h3><a href="/productos/<%= product.id %>"><%= product.name %></a></h3>
-            <% if (product.producer) { %><p class="product-card-producer"><%= product.producer %></p><% } %>
+
+  <div class="products-view" data-view="grid">
+    <div class="products-grid">
+      <% products.forEach((product) => { %>
+        <article class="product-card">
+          <div class="product-card-inner">
+            <div class="product-card-head">
+              <h3><a href="/productos/<%= product.id %>"><%= product.name %></a></h3>
+              <% if (product.producer) { %><p class="product-card-producer"><%= product.producer %></p><% } %>
+            </div>
+            <div class="product-card-badges">
+              <% const tb = typeBadge(product.type); %>
+              <% if (tb) { %><span class="badge badge-<%= tb.tone %>"><%= tb.text %></span><% } %>
+            </div>
+            <% if (product.location) { %>
+              <p class="product-card-location"><%= countries_text(product.location) %></p>
+            <% } %>
           </div>
-          <div class="product-card-badges">
-            <% const tb = typeBadge(product.type); %>
-            <% if (tb) { %><span class="badge badge-<%= tb.tone %>"><%= tb.text %></span><% } %>
+          <div class="product-card-action">
+            <%- include('partials/fav-button', { product }) %>
           </div>
-          <% if (product.location) { %>
-            <p class="product-card-location"><%= countries_text(product.location) %></p>
-          <% } %>
-        </div>
-        <div class="product-card-action">
-          <%- include('partials/fav-button', { product }) %>
-        </div>
-      </article>
-    <% }) %>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="products-view" data-view="table" hidden>
+    <div class="box table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Productor</th>
+            <th scope="col" class="hide-sm">Tipo de producción</th>
+            <th scope="col">País de producción</th>
+            <th scope="col"><span class="sr-only">Favorito</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% products.forEach((product) => { %>
+            <tr>
+              <th scope="row"><a href="/productos/<%= product.id %>"><%= product.name %></a></th>
+              <td><%= product.producer || 'Sin datos' %></td>
+              <td class="hide-sm"><% const tb = typeBadge(product.type); %><% if (tb) { %><span class="badge badge-<%= tb.tone %>"><%= tb.text %></span><% } else { %><span class="muted">Sin datos</span><% } %></td>
+              <td><%= countries_text(product.location) %></td>
+              <td class="cell-actions"><%- include('partials/fav-button', { product }) %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
   </div>
 <% } %>
 <%- include('partials/foot') %>

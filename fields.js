@@ -21,6 +21,8 @@ const ICONS = {
   external: 'M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5',
   back: 'M19 12H5M11 6l-6 6 6 6',
   chart: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
+  grid: 'M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z',
+  table: 'M3 3h18v1H3zM3 6h18v1H3zM3 9h18v1H3zM3 12h18v1H3zM3 15h18v1H3zM3 18h18v1H3zM3 21h18v1H3z',
 };
 
 // <svg> de un icono (trazo, hereda el color del texto).

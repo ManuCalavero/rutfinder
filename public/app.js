@@ -46,4 +46,31 @@
     try { localStorage.setItem(KEY, collapsed ? 'collapsed' : 'open'); } catch (e) {}
     syncSidebar();
   });
+
+  // Vista de productos: alternar entre grid y tabla
+  var VIEW_KEY = 'rutfinder.products-view';
+  var viewButtons = Array.prototype.slice.call(document.querySelectorAll('.view-toggle'));
+  if (viewButtons.length) {
+    var savedView = null;
+    try { savedView = localStorage.getItem(VIEW_KEY) || 'grid'; } catch (e) { savedView = 'grid'; }
+
+    var showView = function (view) {
+      Array.prototype.forEach.call(document.querySelectorAll('.products-view'), function (el) {
+        el.hidden = el.dataset.view !== view;
+      });
+      Array.prototype.forEach.call(viewButtons, function (btn) {
+        btn.classList.toggle('active', btn.dataset.toggleView === view);
+      });
+      try { localStorage.setItem(VIEW_KEY, view); } catch (e) {}
+    };
+
+    viewButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        showView(btn.dataset.toggleView);
+      });
+      if (btn.dataset.toggleView === savedView) btn.classList.add('active');
+    });
+
+    showView(savedView);
+  }
 })();
