@@ -1,0 +1,163 @@
+<%- include('partials/head') %>
+<% const n = (v) => v.toLocaleString('es-ES');
+   const groups = [
+     ['t-dir', 'Directorio', [
+       { icon: 'box', label: 'Productos', value: stats.products, href: '/admin/productos' },
+       { icon: 'globe', label: 'Países', value: stats.countries, href: '/admin/productos' },
+       { icon: 'hidden', label: 'Ocultos', value: stats.hidden, href: '/admin/productos?estado=hidden' },
+     ]],
+     ['t-com', 'Comunidad', [
+       { icon: 'users', label: 'Usuarios', value: stats.users, href: '/admin/usuarios' },
+       { icon: 'inbox', label: 'Solicitudes', value: counts.pending, href: '/admin/solicitudes', alert: counts.pending > 0 },
+       { icon: 'mail', label: 'Mensajes', value: counts.messages, href: '/admin/mensajes', alert: counts.messages > 0 },
+     ]],
+   ];
+   const todo = [
+     { icon: 'inbox', title: 'Solicitudes de acceso', n: counts.pending, href: '/admin/solicitudes',
+       line: latest.request && `${latest.request.name} · ${latest.request.organization}`, when: latest.request && latest.request.created_at, empty: 'No hay solicitudes pendientes.' },
+     { icon: 'bulb', title: 'Sugerencias', n: counts.suggestions, href: '/admin/sugerencias',
+       line: latest.suggestion && `${latest.suggestion.name || 'Sin nombre'} · de ${latest.suggestion.user_name}`, when: latest.suggestion && latest.suggestion.created_at, empty: 'No hay sugerencias sin revisar.' },
+     { icon: 'mail', title: 'Mensajes', n: counts.messages, href: '/admin/mensajes',
+       line: latest.message && `${latest.message.name}: ${latest.message.message}`, when: latest.message && latest.message.created_at, empty: 'No hay mensajes sin atender.' },
+   ];
+   const maxCountry = Math.max(1, ...countries.map((c) => c.n));
+   const placed = countries.filter((c) => c.feature && c.feature.center); // los que se pueden situar en el mapa
+   const withProducts = new Set(placed.map((c) => c.feature.name)); %>
+<div class="page-head">
+  <h1>Inicio</h1>
+  <a class="btn btn-primary" href="/admin/productos/nuevo"><%- icon('plus') %>Nuevo producto</a>
+</div>
+
+<div class="dash-row">
+  <% groups.forEach(([id, title, items]) => { %>
+    <section class="panel" aria-labelledby="<%= id %>">
+      <h2 id="<%= id %>"><%= title %></h2>
+      <div class="kpis">
+        <% items.forEach((k) => { %>
+          <a class="kpi<%= k.alert ? ' kpi-alert' : '' %>" href="<%= k.href %>">
+            <span class="kpi-label"><span class="kpi-ico"><%- icon(k.icon) %></span><%= k.label %></span>
+            <span class="kpi-value"><%= n(k.value) %></span>
+            <span class="kpi-more">Ver detalles<%- icon('next') %></span>
+          </a>
+        <% }) %>
+      </div>
+    </section>
+  <% }) %>
+</div>
+
+<div class="dash-row">
+  <section class="panel panel-map" aria-labelledby="t-mapa">
+    <div class="panel-head">
+      <h2 id="t-mapa">Dónde se producen</h2>
+      <span class="panel-note"><%= placed.length %> <%= placed.length === 1 ? 'país' : 'países' %></span>
+    </div>
+    <%# Países con productos en rojo suave; un marcador en cada uno, más grande cuantos más productos tiene. %>
+    <svg class="world" viewBox="0 0 960 424" role="img" aria-label="Mapa: países con productos">
+      <% world.forEach((f) => { %><path d="<%= f.d %>"<%- withProducts.has(f.name) ? ' class="has"' : '' %>><title><%= f.name %></title></path><% }) %>
+      <% placed.slice().reverse().forEach((c) => { const r = 5 + 7 * Math.sqrt(c.n / maxCountry); %>
+        <a class="pin" href="/admin/productos?pais=<%= encodeURIComponent(c.label) %>">
+          <title><%= c.label %>: <%= c.n %> <%= c.n === 1 ? 'producto' : 'productos' %></title>
+          <circle class="pin-halo" cx="<%= c.feature.center.x %>" cy="<%= c.feature.center.y %>" r="<%= (r + 5).toFixed(1) %>"/>
+          <circle class="pin-dot" cx="<%= c.feature.center.x %>" cy="<%= c.feature.center.y %>" r="<%= r.toFixed(1) %>"/>
+        </a>
+      <% }) %>
+    </svg>
+  </section>
+
+  <section class="panel" aria-labelledby="t-paises">
+    <div class="panel-head">
+      <h2 id="t-paises">Productos por país</h2>
+      <a class="panel-link" href="/admin/productos">Ver todos<%- icon('next') %></a>
+    </div>
+    <% if (!countries.length) { %>
+      <p class="muted">Todavía no hay productos.</p>
+    <% } else { %>
+      <ol class="bars">
+        <% countries.slice(0, 8).forEach((c) => { %>
+          <li>
+            <a href="/admin/productos?pais=<%= encodeURIComponent(c.label) %>" title="<%= c.label %>: <%= c.n %> <%= c.n === 1 ? 'producto' : 'productos' %>">
+              <span class="bar-label"><%= c.label %></span>
+              <span class="bar-track"><span class="bar" style="width: <%= (c.n / maxCountry * 100).toFixed(1) %>%"></span></span>
+              <span class="bar-value"><%= c.n %></span>
+            </a>
+          </li>
+        <% }) %>
+      </ol>
+    <% } %>
+  </section>
+</div>
+
+<section class="dash-section" aria-labelledby="t-todo">
+  <h2 id="t-todo">Por revisar</h2>
+  <div class="todo">
+    <% todo.forEach((t) => { %>
+      <article class="panel todo-card">
+        <div class="todo-top">
+          <span class="tile"><%- icon(t.icon) %></span>
+          <span class="status<%= t.n ? ' status-on' : '' %>"><%= t.n ? `${t.n} ${t.n === 1 ? 'pendiente' : 'pendientes'}` : 'Al día' %></span>
+        </div>
+        <h3><%= t.title %></h3>
+        <% if (t.line) { %>
+          <p class="todo-line"><%= t.line %></p>
+          <p class="todo-meta"><%= hace(t.when) %></p>
+        <% } else { %>
+          <p class="todo-line muted"><%= t.empty %></p>
+        <% } %>
+        <a class="todo-link" href="<%= t.href %>"><%= t.n ? 'Revisar' : 'Abrir' %><%- icon('next') %></a>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<div class="dash-row dash-row-end dash-row-3">
+  <section class="panel tip" aria-labelledby="t-busquedas">
+    <span class="tile"><%- icon('search') %></span>
+    <div>
+      <h2 id="t-busquedas">Lo más buscado</h2>
+      <% if (!searches.length) { %>
+        <p class="muted">Aquí verás lo que busca la gente antes de pedir acceso.</p>
+      <% } else { %>
+        <ul class="terms">
+          <% searches.forEach((s) => { %><li><a href="/admin/productos?q=<%= encodeURIComponent(s.term) %>"><%= s.term %><span><%= s.n %></span></a></li><% }) %>
+        </ul>
+      <% } %>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="t-comparado">
+    <div class="panel-head">
+      <h2 id="t-comparado">Lo más comparado</h2>
+      <span class="panel-note"><%= comparedMonth %> en 30 días</span>
+    </div>
+    <% if (!compared.length) { %>
+      <p class="muted">Aquí verás qué productos comparan los usuarios.</p>
+    <% } else { %>
+      <ol class="pairs">
+        <% compared.forEach((c) => { %>
+          <li>
+            <span><a href="/productos/<%= c.a %>"><%= c.name_a %></a><span class="vs">vs</span><a href="/productos/<%= c.b %>"><%= c.name_b %></a></span>
+            <span class="pair-n" title="<%= c.n %> <%= c.n === 1 ? 'vez' : 'veces' %>"><%= c.n %></span>
+          </li>
+        <% }) %>
+      </ol>
+    <% } %>
+  </section>
+
+  <section class="panel" aria-labelledby="t-accesos">
+    <div class="panel-head"><h2 id="t-accesos">Últimos accesos</h2></div>
+    <% if (!logins.length) { %>
+      <p class="muted">Todavía no hay accesos.</p>
+    <% } else { %>
+      <ul class="logins">
+        <% logins.forEach((l) => { %>
+          <li>
+            <span class="avatar avatar-sm" aria-hidden="true"><%= l.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase() %></span>
+            <span><strong><%= l.name %></strong><small><%= l.organization %></small></span>
+            <time datetime="<%= new Date(l.last_login_at).toISOString() %>" title="<%= new Date(l.last_login_at).toLocaleString('es-ES') %>"><%= hace(l.last_login_at) %></time>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </section>
+</div>
+<%- include('partials/foot') %>

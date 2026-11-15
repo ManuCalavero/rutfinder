@@ -1,9 +1,33 @@
-<% if (user) { %>
-  </main>
-</div>
-<% } else { %>
 </main>
-<footer class="footer">Rutfinder · Repositorio de alimentos terapéuticos listos para usar (RUTF)</footer>
+<% if (user && user.role === 'admin') { %></div></div><% } %>
+<% if (!user && !locals.bare) { %>
+<%# Pie de la web pública: claim, llamadas a la acción, enlaces y selector de idioma %>
+<% const cols = [
+     [t('footer.colDirectory'), [['/#proposito', t('nav.what')], ['/', t('footer.search')]]],
+     [t('footer.colAccount'), [['/registro', t('nav.signup')], ['/login', t('nav.login')]]],
+     [t('footer.colCompany'), [['/sobre', t('nav.about')], ['/#contacto', t('nav.contact')], ['/#contacto', t('footer.addProduct')]]],
+   ]; %>
+<footer class="site-footer">
+  <div class="footer-top">
+    <p class="footer-claim"><span><%= t('footer.claim1') %></span> <span><%= t('footer.claim2') %></span></p>
+    <p class="footer-cta">
+      <a class="btn btn-primary btn-lg" href="/registro"><%= t('nav.signup') %></a>
+      <a class="btn btn-lg btn-ghost" href="/#contacto"><%- icon('mail') %><%= t('footer.write') %></a>
+    </p>
+  </div>
+  <nav class="footer-cols" aria-label="<%= t('footer.label') %>">
+    <% cols.forEach(([title, items]) => { %>
+      <div>
+        <h2><%= title %></h2>
+        <ul><% items.forEach(([href, text]) => { %><li><a href="<%= href %>"><%= text %></a></li><% }) %></ul>
+      </div>
+    <% }) %>
+  </nav>
+  <div class="footer-bottom">
+    <%- include('lang', { up: true }) %>
+    <p><a class="brand" href="/"><img src="/logo.svg" alt="" width="20" height="20">rutfinder</a><span>© <%= year %></span></p>
+  </div>
+</footer>
 <% } %>
 </body>
 </html>

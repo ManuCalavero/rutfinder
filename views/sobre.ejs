@@ -1,0 +1,40 @@
+<%- include('partials/head') %>
+<%# Textos en locales/*.json (about.*). Para poner la imagen, añade un <img src="/sobre.png" alt="…"> dentro de .media (el archivo va en public/). %>
+<div class="about">
+  <section class="section-head about-head">
+    <h1><%= t('about.heading') %></h1>
+    <p><%= t('about.lead') %></p>
+  </section>
+
+  <div class="module about-media reveal"><div class="media"></div></div>
+
+  <section class="about-row reveal" aria-labelledby="t-por-que">
+    <h2 id="t-por-que"><%= t('about.whyTitle') %></h2>
+    <div>
+      <p><%= t('about.whyP1') %></p>
+      <p><%= t('about.whyP2') %></p>
+      <% if (products) { %>
+        <dl class="about-stats">
+          <div><dt><%= t('about.statProducts') %></dt><dd><%= num(products) %></dd></div>
+          <% if (countries) { %><div><dt><%= t('about.statCountries') %></dt><dd><%= num(countries) %></dd></div><% } %>
+        </dl>
+      <% } %>
+    </div>
+  </section>
+
+  <section class="about-row reveal" aria-labelledby="t-como">
+    <h2 id="t-como"><%= t('about.howTitle') %></h2>
+    <ol class="steps">
+      <% [1, 2, 3].forEach((i) => { %><li><span class="step-num">0<%= i %>/</span><h3><%= t(`about.s${i}Title`) %></h3><p><%= t(`about.s${i}Text`) %></p></li><% }) %>
+    </ol>
+  </section>
+
+  <section class="module cta reveal" aria-labelledby="t-cta">
+    <h2 id="t-cta"><%= t('about.ctaTitle') %></h2>
+    <p class="actions">
+      <a class="btn btn-primary btn-lg" href="/#contacto"><%= t('about.ctaWrite') %></a>
+      <a class="btn btn-lg" href="/registro"><%= t('about.ctaSignup') %></a>
+    </p>
+  </section>
+</div>
+<%- include('partials/foot') %>

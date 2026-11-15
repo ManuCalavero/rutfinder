@@ -1,0 +1,30 @@
+<%- include('partials/head') %>
+<h1>Mensajes</h1>
+<% if (!messages.length) { %>
+  <div class="box blankslate"><p>No hay mensajes sin atender.</p></div>
+<% } else { %>
+  <div class="box table-wrap">
+    <table data-sortable>
+      <thead>
+        <tr><th scope="col" data-sort>De</th><th scope="col">Mensaje</th><th scope="col" class="hide-sm" data-sort aria-sort="ascending">Fecha</th><th scope="col"><span class="sr-only">Acciones</span></th></tr>
+      </thead>
+      <tbody>
+        <% messages.forEach((m) => { %>
+          <tr>
+            <th scope="row" data-value="<%= m.name %>"><%= m.name %><small><%= m.email %></small></th>
+            <td class="cell-wrap pre"><%= m.message %></td>
+            <td class="hide-sm" data-value="<%= new Date(m.created_at).toISOString() %>"><time datetime="<%= new Date(m.created_at).toISOString() %>" title="<%= new Date(m.created_at).toLocaleString('es-ES') %>"><%= hace(m.created_at) %></time></td>
+            <td class="cell-actions">
+              <a class="btn btn-sm" href="mailto:<%= m.email %>?subject=<%= encodeURIComponent('Tu mensaje a Rutfinder') %>">Responder</a>
+              <form method="post" action="/admin/mensajes/<%= m.id %>/atendido">
+                <input type="hidden" name="_csrf" value="<%= csrf() %>">
+                <button type="submit" class="btn btn-sm" aria-label="Marcar como atendido el mensaje de <%= m.name %>">Atendido</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+<%- include('partials/foot') %>

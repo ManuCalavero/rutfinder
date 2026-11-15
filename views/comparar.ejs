@@ -1,0 +1,94 @@
+<%- include('partials/head') %>
+<%# Comparador (textos: compare.*). Se eligen dos productos; los favoritos salen primero en la lista.
+    «Solo diferencias» oculta las filas iguales sin JavaScript (CSS :has). %>
+<% const favs = products.filter((p) => p.favorite);
+   const optionText = (p) => p.producer ? `${p.name} — ${p.producer.length > 40 ? `${p.producer.slice(0, 40)}…` : p.producer}` : p.name;
+   const pickers = [['a', a, t('compare.pickA')], ['b', b, t('compare.pickB')]]; %>
+<div class="page-head"><h1><%= t('compare.title') %></h1></div>
+
+<form class="box cmp-pick" method="get" action="/comparar">
+  <% pickers.forEach(([name, current, label], i) => { %>
+    <% if (i === 1) { %>
+      <% if (a && b) { %>
+        <a class="btn cmp-swap" href="/comparar?a=<%= b.id %>&b=<%= a.id %>" title="<%= t('compare.swap') %>" aria-label="<%= t('compare.swap') %>"><%- icon('swap') %></a>
+      <% } else { %>
+        <span class="cmp-swap" aria-hidden="true"><%- icon('swap') %></span>
+      <% } %>
+    <% } %>
+    <div class="cmp-field">
+      <label for="cmp-<%= name %>"><%= label %></label>
+      <select id="cmp-<%= name %>" name="<%= name %>" required>
+        <option value=""><%= t('compare.choose') %></option>
+        <% if (favs.length) { %>
+          <optgroup label="<%= t('nav.favorites') %>">
+            <% favs.forEach((p) => { %><option value="<%= p.id %>" <%= current && current.id === p.id ? 'selected' : '' %>><%= optionText(p) %></option><% }) %>
+          </optgroup>
+        <% } %>
+        <optgroup label="<%= t('compare.all') %>">
+          <% products.forEach((p) => { %><option value="<%= p.id %>" <%= current && current.id === p.id && !p.favorite ? 'selected' : '' %>><%= optionText(p) %></option><% }) %>
+        </optgroup>
+      </select>
+    </div>
+  <% }) %>
+  <button class="btn btn-primary" type="submit"><%= t('compare.submit') %></button>
+</form>
+
+<% if (!comparison) { %>
+  <div class="box blankslate cmp-empty">
+    <span class="tile"><%- icon('swap') %></span>
+    <p><%= a && b ? t('compare.same') : t('compare.empty') %></p>
+  </div>
+<% } else { %>
+  <div class="cmp">
+    <div class="cmp-bar">
+      <label class="switch"><input type="checkbox" id="only-diff"><span class="switch-ui" aria-hidden="true"></span><%= t('compare.onlyDiff') %></label>
+      <span class="muted"><%= t('compare.differences', { n: comparison.differences }) %></span>
+    </div>
+
+    <div class="cmp-head">
+      <span></span>
+      <% [[a, comparison.badgesA], [b, comparison.badgesB]].forEach(([p, list]) => { %>
+        <div class="cmp-prod">
+          <a class="cmp-name" href="/productos/<%= p.id %>"><%= p.name %></a>
+          <% if (list.length) { %><p class="badges"><% list.forEach((x) => { %><span class="badge badge-<%= x.tone %>"><%- icon(x.icon) %><%= x.text %></span><% }) %></p><% } %>
+        </div>
+      <% }) %>
+    </div>
+
+    <% const cell = (v, est) => { %>
+      <div class="cmp-val<%= v ? '' : ' empty' %>">
+        <% if (!v) { %><%= t('noData') %><% } else { const long = v.length > 320; %>
+          <% if (est) { %><span class="badge"><%= t('product.estimated') %></span> <% } %>
+          <div class="cmp-text<%= long ? ' clamp' : '' %>"><%- linkify(v) %></div>
+          <% if (long) { %><details class="more"><summary><span class="more-open"><%= t('compare.more') %></span><span class="more-close"><%= t('compare.less') %></span></summary></details><% } %>
+        <% } %>
+      </div>
+    <% }; %>
+
+    <% comparison.groups.forEach((g) => { %>
+      <section class="box cmp-group<%= g.differs ? '' : ' same' %>" aria-labelledby="c-<%= g.id %>">
+        <h2 id="c-<%= g.id %>"><%- icon(g.id) %><%= g.title %></h2>
+        <% g.rows.forEach((r) => { %>
+          <% if (r.list) { %>
+            <div class="cmp-row cmp-list-head<%= r.same ? ' same' : '' %>">
+              <div class="cmp-label"><%= r.label %><% if (r.estA || r.estB) { %> <span class="badge"><%= t('product.estimated') %></span><% } %></div>
+            </div>
+            <% r.list.forEach((l) => { %>
+              <div class="cmp-row cmp-sub<%= l.same ? ' same' : '' %>">
+                <div class="cmp-label"><%= l.label %></div>
+                <div class="cmp-val<%= l.a ? '' : ' empty' %>"><%= l.a || t('noData') %></div>
+                <div class="cmp-val<%= l.b ? '' : ' empty' %>"><%= l.b || t('noData') %></div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div class="cmp-row<%= r.same ? ' same' : '' %>">
+              <div class="cmp-label"><%= r.label %></div>
+              <% cell(r.a, r.estA); cell(r.b, r.estB); %>
+            </div>
+          <% } %>
+        <% }) %>
+      </section>
+    <% }) %>
+  </div>
+<% } %>
+<%- include('partials/foot') %>

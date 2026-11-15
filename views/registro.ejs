@@ -1,21 +1,72 @@
 <%- include('partials/head') %>
-<section class="narrow">
-  <h1 class="center">Solicitar acceso</h1>
-  <p class="muted center">Un administrador revisará tu solicitud antes de darte acceso.</p>
-  <% if (error) { %><div class="flash flash-error" role="alert"><%= error %></div><% } %>
-  <form method="post" action="/registro" class="box box-pad form">
-    <input type="hidden" name="_csrf" value="<%= csrf() %>">
-    <label for="name">Nombre</label>
-    <input id="name" name="name" type="text" value="<%= values.name || '' %>" maxlength="100" autocomplete="name" required>
-    <label for="email">Email</label>
-    <input id="email" name="email" type="email" value="<%= values.email || '' %>" maxlength="254" autocomplete="email" required>
-    <label for="organization">Organización</label>
-    <input id="organization" name="organization" type="text" value="<%= values.organization || '' %>" maxlength="150" autocomplete="organization" required>
-    <label for="password">Contraseña</label>
-    <input id="password" name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" aria-describedby="password-help" required>
-    <p id="password-help" class="hint">Mínimo 8 caracteres.</p>
-    <button type="submit" class="btn btn-primary btn-block">Enviar solicitud</button>
-  </form>
-  <p class="box box-pad center">¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>.</p>
-</section>
+<%# Solicitar acceso, en un único bloque como el de «Hablemos»: resultado y motivos a la izquierda, formulario a la derecha.
+    Si se llega desde el buscador de la portada, arriba solo se dice cuántos productos coinciden. Textos: signup.* %>
+<% const found = search && count > 0; %>
+<div class="access">
+  <div class="module access-grid">
+    <div class="access-main">
+      <% if (search) { %>
+        <section class="match rise" aria-labelledby="t-match">
+          <% if (found) { %>
+            <span class="match-check"><%- icon('check') %></span>
+            <h1 id="t-match"><%- t('signup.found', { count, n: `<span class="match-n">${count}</span>`, q: esc(search) }) %></h1>
+          <% } else { %>
+            <div>
+              <h1 id="t-match"><%= t('signup.none', { q: search }) %></h1>
+              <p><%= t('signup.noneHelp') %> <a class="link" href="/#contacto"><%= t('signup.noneLink') %></a></p>
+            </div>
+          <% } %>
+        </section>
+      <% } %>
+      <section class="access-why">
+        <% if (search) { %>
+          <h2><%= found ? t('signup.askFound', { n: count }) : t('signup.ask') %></h2>
+        <% } else { %>
+          <h1><%= t('signup.title') %></h1>
+        <% } %>
+        <ul class="why">
+          <li><span class="tint tint-mint"><%- icon('users') %></span><div><h3><%= t('signup.why1Title') %></h3><p><%= t('signup.why1Text') %></p></div></li>
+          <li><span class="tint tint-sun"><%- icon('evidence') %></span><div><h3><%= t('signup.why2Title') %></h3><p><%= t('signup.why2Text') %></p></div></li>
+          <li><span class="tint tint-lilac"><%- icon('mail') %></span><div><h3><%= t('signup.why3Title') %></h3><p><%= t(found ? 'signup.why3TextFound' : 'signup.why3Text') %></p></div></li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="access-form">
+      <% if (error) { %><div class="flash flash-error" role="alert"><%= error %></div><% } %>
+      <%# Sin JavaScript valida el navegador (required, pattern, minlength). Con app.js: mensajes bajo cada campo y botón de ver/ocultar. %>
+      <form method="post" action="/registro" data-validate>
+        <input type="hidden" name="_csrf" value="<%= csrf() %>">
+        <% if (search) { %><input type="hidden" name="busqueda" value="<%= search %>"><% } %>
+        <div class="field">
+          <label for="name"><%= t('signup.name') %></label>
+          <input id="name" name="name" type="text" value="<%= values.name || '' %>" maxlength="100" autocomplete="name" required aria-describedby="name-error" data-error="<%= t('errors.name') %>">
+          <p class="field-error" id="name-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="email"><%= t('signup.email') %></label>
+          <input id="email" name="email" type="email" value="<%= values.email || '' %>" maxlength="254" autocomplete="email" required pattern="[^\s@]+@[^\s@]+\.[^\s@]+" aria-describedby="email-error" data-error="<%= t('errors.email') %>">
+          <p class="field-error" id="email-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="organization"><%= t('signup.organization') %></label>
+          <input id="organization" name="organization" type="text" value="<%= values.organization || '' %>" maxlength="150" autocomplete="organization" required aria-describedby="organization-error" data-error="<%= t('errors.organization') %>">
+          <p class="field-error" id="organization-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="password"><%= t('signup.password') %></label>
+          <div class="pw">
+            <input id="password" name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" required aria-describedby="password-hint password-error" data-error="<%= t('errors.password') %>">
+            <button class="pw-toggle" type="button" aria-controls="password" aria-pressed="false" aria-label="<%= t('signup.show') %>" data-show="<%= t('signup.show') %>" data-hide="<%= t('signup.hide') %>" hidden><%- icon('eye') %><%- icon('hidden') %></button>
+          </div>
+          <p class="field-hint" id="password-hint"><%= t('signup.passwordHint') %></p>
+          <p class="field-error" id="password-error" hidden></p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block"><%= t('signup.submit') %></button>
+        <p class="secure"><%- icon('lock') %><span><strong><%= t('signup.secureTitle') %></strong> <%= t('signup.secureText') %></span></p>
+      </form>
+      <p class="alt"><%= t('signup.haveAccount') %> <a class="link" href="/login"><%= t('nav.login') %></a></p>
+    </div>
+  </div>
+</div>
 <%- include('partials/foot') %>

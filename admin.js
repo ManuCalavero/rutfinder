@@ -3,6 +3,7 @@ const multer = require('multer');
 const ExcelJS = require('exceljs');
 const bcrypt = require('bcryptjs');
 const { pool, q, getFields, findProducts, listCountries, readFilters } = require('./db');
+const { FEATURES, countryStats } = require('./world');
 const { groupFields } = require('./fields');
 
 const SHEET = 'RUTF';
@@ -99,8 +100,37 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
 
   router.param('id', (req, res, next, id) => (/^\d{1,9}$/.test(id) ? next() : notFound(res)));
 
-  // ----- Solicitudes de registro -----
+  // ----- Inicio: resumen del panel (solicitudes, sugerencias y mensajes vienen en res.locals.counts) -----
   router.get('/', async (req, res) => {
+    const stats = (await q(`SELECT (SELECT count(*)::int FROM products) AS products,
+                                   (SELECT count(*)::int FROM products WHERE hidden) AS hidden,
+                                   (SELECT count(*)::int FROM users WHERE status = 'approved') AS users`)).rows[0];
+    // Países: las variantes de un mismo país en el Excel («USA», «Sri-Lanka»…) cuentan como uno (world.js).
+    const { rows: locations } = await q(`SELECT id, hidden, data->>'Production location' AS location FROM products`);
+    stats.countries = countryStats(locations).length;
+    const countries = countryStats(locations.filter((r) => !r.hidden)); // mapa y barras: lo que ven los usuarios
+    const { rows: logins } = await q("SELECT name, organization, last_login_at FROM users WHERE last_login_at IS NOT NULL AND role = 'user' ORDER BY last_login_at DESC LIMIT 5");
+    // Lo último pendiente de cada bandeja.
+    const latest = {
+      request: (await q("SELECT name, organization, created_at FROM users WHERE status = 'pending' ORDER BY created_at DESC LIMIT 1")).rows[0],
+      suggestion: (await q('SELECT s.name, s.created_at, u.name AS user_name FROM suggestions s JOIN users u ON u.id = s.user_id WHERE NOT s.reviewed ORDER BY s.created_at DESC LIMIT 1')).rows[0],
+      message: (await q('SELECT name, message, created_at FROM messages WHERE NOT answered ORDER BY created_at DESC LIMIT 1')).rows[0],
+    };
+    res.render('admin-inicio', {
+      title: 'Inicio', stats, logins, latest, countries, world: FEATURES,
+      // Lo que buscó la gente en la portada antes de pedir acceso.
+      searches: (await q(`SELECT lower(trim(signup_search)) AS term, count(*)::int AS n FROM users
+                           WHERE coalesce(trim(signup_search), '') <> '' GROUP BY 1 ORDER BY 2 DESC, 1 LIMIT 8`)).rows,
+      // Uso del comparador: parejas más comparadas y total de los últimos 30 días.
+      compared: (await q(`SELECT c.product_a AS a, c.product_b AS b, pa.name AS name_a, pb.name AS name_b, count(*)::int AS n
+                            FROM comparisons c JOIN products pa ON pa.id = c.product_a JOIN products pb ON pb.id = c.product_b
+                           GROUP BY 1, 2, 3, 4 ORDER BY 5 DESC, 3 LIMIT 5`)).rows,
+      comparedMonth: (await q("SELECT count(*)::int AS n FROM comparisons WHERE created_at > now() - interval '30 days'")).rows[0].n,
+    });
+  });
+
+  // ----- Solicitudes de registro -----
+  router.get('/solicitudes', async (req, res) => {
     const { rows } = await q("SELECT id, name, email, organization, created_at FROM users WHERE status = 'pending' ORDER BY created_at");
     res.render('admin-solicitudes', { title: 'Solicitudes', requests: rows });
   });
@@ -108,7 +138,7 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
   router.post('/usuarios/:id/aprobar', async (req, res) => {
     const { rowCount } = await q("UPDATE users SET status = 'approved' WHERE id = $1 AND status = 'pending'", [req.params.id]);
     flash(req, rowCount ? 'success' : 'error', rowCount ? 'Solicitud aprobada. Esa persona ya puede iniciar sesión.' : 'La solicitud ya no está pendiente.');
-    res.redirect('/admin');
+    res.redirect('/admin/solicitudes');
   });
 
   router.get('/usuarios/:id/rechazar', async (req, res) => {
@@ -117,14 +147,14 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
     res.render('confirmar', {
       title: 'Rechazar solicitud',
       text: `¿Rechazar la solicitud de ${user.name} (${user.email})? No podrá iniciar sesión.`,
-      action: `/admin/usuarios/${user.id}/rechazar`, confirmLabel: 'Rechazar solicitud', cancelHref: '/admin',
+      action: `/admin/usuarios/${user.id}/rechazar`, confirmLabel: 'Rechazar solicitud', cancelHref: '/admin/solicitudes',
     });
   });
 
   router.post('/usuarios/:id/rechazar', async (req, res) => {
     const { rowCount } = await q("UPDATE users SET status = 'rejected' WHERE id = $1 AND status = 'pending'", [req.params.id]);
     flash(req, rowCount ? 'success' : 'error', rowCount ? 'Solicitud rechazada.' : 'La solicitud ya no está pendiente.');
-    res.redirect('/admin');
+    res.redirect('/admin/solicitudes');
   });
 
   // ----- Productos -----
@@ -136,6 +166,7 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
       products: await findProducts({ ...filters, state }),
       countries: await listCountries(true),
       pendingImport: (await q('SELECT 1 FROM import_drafts WHERE user_id = $1', [req.user.id])).rowCount > 0,
+      openImport: req.query.importar === '1', // «Importar Excel» del menú lateral abre el formulario
     });
   });
 
@@ -280,6 +311,18 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
     const { rowCount } = await q('UPDATE suggestions SET reviewed = true WHERE id = $1 AND NOT reviewed', [req.params.id]);
     flash(req, rowCount ? 'success' : 'error', rowCount ? 'Sugerencia marcada como revisada.' : 'Esa sugerencia ya estaba revisada.');
     res.redirect('/admin/sugerencias');
+  });
+
+  // ----- Mensajes del formulario de contacto -----
+  router.get('/mensajes', async (req, res) => {
+    const { rows } = await q('SELECT * FROM messages WHERE NOT answered ORDER BY created_at');
+    res.render('admin-mensajes', { title: 'Mensajes', messages: rows });
+  });
+
+  router.post('/mensajes/:id/atendido', async (req, res) => {
+    const { rowCount } = await q('UPDATE messages SET answered = true WHERE id = $1 AND NOT answered', [req.params.id]);
+    flash(req, rowCount ? 'success' : 'error', rowCount ? 'Mensaje marcado como atendido.' : 'Ese mensaje ya estaba atendido.');
+    res.redirect('/admin/mensajes');
   });
 
   // ----- Mi cuenta (menú de perfil) -----

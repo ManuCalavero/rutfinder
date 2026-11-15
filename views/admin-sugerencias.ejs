@@ -1,22 +1,17 @@
 <%- include('partials/head') %>
-<div class="page-head">
-  <div>
-    <h1>Sugerencias</h1>
-    <p class="muted">Productos que los usuarios proponen añadir. Si procede, <a href="/admin/productos/nuevo">crea el producto</a> y marca la sugerencia como revisada.</p>
-  </div>
-</div>
+<h1>Sugerencias</h1>
 <% if (!suggestions.length) { %>
-  <div class="box blankslate"><h2>No hay sugerencias sin revisar</h2><p>Las sugerencias de los usuarios aparecerán aquí.</p></div>
+  <div class="box blankslate"><p>No hay sugerencias sin revisar.</p></div>
 <% } else { %>
   <div class="box table-wrap">
-    <table>
+    <table data-sortable>
       <thead>
-        <tr><th scope="col">Producto</th><th scope="col">Enlace y notas</th><th scope="col">Sugerido por</th><th scope="col" class="hide-sm">Fecha</th><th scope="col"><span class="sr-only">Acciones</span></th></tr>
+        <tr><th scope="col" data-sort>Producto</th><th scope="col">Enlace y notas</th><th scope="col" class="hide-sm" data-sort>De</th><th scope="col" class="hide-sm" data-sort aria-sort="ascending">Fecha</th><th scope="col"><span class="sr-only">Acciones</span></th></tr>
       </thead>
       <tbody>
         <% suggestions.forEach((s) => { %>
           <tr>
-            <th scope="row">
+            <th scope="row" data-value="<%= s.name %>">
               <%= s.name || 'Sin nombre' %>
               <% if (s.producer || s.country) { %><small><%= [s.producer, s.country].filter(Boolean).join(' · ') %></small><% } %>
             </th>
@@ -25,12 +20,12 @@
               <% if (s.notes) { %><div class="pre"><%= s.notes %></div><% } %>
               <% if (!s.url && !s.notes) { %><span class="muted">Sin datos</span><% } %>
             </td>
-            <td><%= s.user_name %><small><%= s.user_org %></small></td>
-            <td class="hide-sm"><%= fecha(s.created_at) %></td>
+            <td class="hide-sm" data-value="<%= s.user_name %>"><%= s.user_name %><small><%= s.user_org %></small></td>
+            <td class="hide-sm" data-value="<%= new Date(s.created_at).toISOString() %>"><%= fecha(s.created_at) %></td>
             <td class="cell-actions">
               <form method="post" action="/admin/sugerencias/<%= s.id %>/revisada">
                 <input type="hidden" name="_csrf" value="<%= csrf() %>">
-                <button type="submit" class="btn btn-sm" aria-label="Marcar como revisada la sugerencia de <%= s.user_name %>">Marcar revisada</button>
+                <button type="submit" class="btn btn-sm" aria-label="Marcar como revisada la sugerencia de <%= s.user_name %>">Revisada</button>
               </form>
             </td>
           </tr>

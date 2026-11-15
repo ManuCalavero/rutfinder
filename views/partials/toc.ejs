@@ -1,0 +1,3 @@
+<nav class="toc" aria-label="<%= t('product.sections') %>">
+  <% groups.forEach((g) => { %><a href="#<%= g.id %>"<%- g.filled ? '' : ' class="toc-empty"' %>><%- icon(g.id) %><%= g.title %></a><% }) %>
+</nav>

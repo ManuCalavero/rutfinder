@@ -1,122 +1,117 @@
 <%- include('partials/head') %>
 <% const filtered = search || country; const base = onlyFavorites ? '/favoritos' : '/productos'; %>
+<% const meta = (p) => [typeLabel(p.type), p.location && countries_text(p.location)].filter(Boolean).join(' · '); %>
 <div class="page-head">
   <h1><%= title %></h1>
-  <div class="page-head-actions">
-    <% if (products && products.length) { %>
-      <button class="view-toggle" data-toggle-view="grid" title="Vista de cards">
-        <%- icon('grid') %>
-      </button>
-      <button class="view-toggle" data-toggle-view="table" title="Vista de tabla">
-        <%- icon('table') %>
-      </button>
-    <% } %>
-    <% if (!onlyFavorites) { %>
+  <% if (!onlyFavorites) { %>
     <details class="dropdown" <%= openSuggest ? 'open' : '' %>>
-      <summary class="btn btn-primary">Sugerir producto</summary>
-    <form method="post" action="/sugerencias" class="dropdown-panel form">
-      <input type="hidden" name="_csrf" value="<%= csrf() %>">
-      <h2>Sugerir un producto</h2>
-      <p class="hint">¿Falta algún RUTF? Pega un enlace donde aparezca o rellena lo que sepas. Un administrador lo revisará.</p>
-      <label for="s-url">Enlace al producto</label>
-      <input id="s-url" name="url" type="url" maxlength="500" placeholder="https://…" autocomplete="off">
-      <p class="divider"><span>o rellena los datos</span></p>
-      <label for="s-name">Nombre del producto</label>
-      <input id="s-name" name="name" type="text" maxlength="300" autocomplete="off">
-      <label for="s-producer">Productor</label>
-      <input id="s-producer" name="producer" type="text" maxlength="150" autocomplete="off">
-      <label for="s-country">País de producción</label>
-      <input id="s-country" name="country" type="text" maxlength="100" autocomplete="off">
-      <label for="s-notes">Notas</label>
-      <textarea id="s-notes" name="notes" rows="3" maxlength="2000" placeholder="Composición, coste, fuente… lo que sepas"></textarea>
-      <button type="submit" class="btn btn-primary btn-block">Enviar sugerencia</button>
-    </form>
-  </details>
-    <% } %>
-  </div>
+      <summary class="btn"><%= t('products.suggest') %></summary>
+      <form method="post" action="/sugerencias" class="dropdown-panel">
+        <input type="hidden" name="_csrf" value="<%= csrf() %>">
+        <label for="s-url"><%= t('products.link') %></label>
+        <input id="s-url" name="url" type="url" maxlength="500" autocomplete="off">
+        <label for="s-name"><%= t('products.name') %></label>
+        <input id="s-name" name="name" type="text" maxlength="300" autocomplete="off">
+        <label for="s-producer"><%= t('products.producer') %></label>
+        <input id="s-producer" name="producer" type="text" maxlength="150" autocomplete="off">
+        <label for="s-country"><%= t('products.country') %></label>
+        <input id="s-country" name="country" type="text" maxlength="100" autocomplete="off">
+        <label for="s-notes"><%= t('products.notes') %></label>
+        <textarea id="s-notes" name="notes" rows="3" maxlength="2000"></textarea>
+        <button type="submit" class="btn btn-primary btn-block"><%= t('products.send') %></button>
+      </form>
+    </details>
+  <% } %>
 </div>
 
 <form method="get" action="<%= base %>" class="filters" role="search">
-  <div>
-    <label for="q">Buscar</label>
-    <input id="q" name="q" type="search" value="<%= search %>" maxlength="100" placeholder="Nombre, productor, ingrediente…">
-  </div>
-  <div>
-    <label for="pais">País de producción</label>
-    <select id="pais" name="pais">
-      <option value="">Todos los países</option>
-      <% countries.forEach((c) => { %><option value="<%= c %>" <%= c === country ? 'selected' : '' %>><%= c %></option><% }) %>
-    </select>
-  </div>
-  <button type="submit" class="btn">Filtrar</button>
-  <% if (filtered) { %><a href="<%= base %>">Limpiar filtros</a><% } %>
+  <input name="q" type="search" value="<%= search %>" maxlength="100" placeholder="<%= t('products.search') %>" aria-label="<%= t('products.search') %>">
+  <select name="pais" aria-label="<%= t('products.countryLabel') %>">
+    <option value=""><%= t('products.allCountries') %></option>
+    <% countries.forEach((c) => { %><option value="<%= c %>" <%= c === country ? 'selected' : '' %>><%= c %></option><% }) %>
+  </select>
+  <button type="submit" class="btn"><%= t('products.filter') %></button>
+  <% if (filtered) { %><a class="link" href="<%= base %>"><%= t('products.clear') %></a><% } %>
+  <% if (products.length) { %>
+    <span class="views">
+      <button type="button" class="view-toggle" data-toggle-view="grid" aria-label="<%= t('products.cards') %>" title="<%= t('products.cards') %>" hidden><%- icon('grid') %></button>
+      <button type="button" class="view-toggle" data-toggle-view="table" aria-label="<%= t('products.table') %>" title="<%= t('products.table') %>" hidden><%- icon('list') %></button>
+      <button type="button" class="view-toggle" data-toggle-view="map" aria-label="<%= t('products.map') %>" title="<%= t('products.map') %>" hidden><%- icon('map') %></button>
+    </span>
+  <% } %>
 </form>
 
 <% if (!products.length) { %>
   <div class="box blankslate">
     <% if (filtered) { %>
-      <h2>Ningún producto coincide con tu búsqueda</h2>
-      <p><a href="<%= base %>">Limpiar filtros</a></p>
+      <p><%= t('products.noMatch') %></p>
     <% } else if (onlyFavorites) { %>
-      <h2>Aún no tienes favoritos</h2>
-      <p>Guarda productos desde el <a href="/productos">catálogo de productos</a> para tenerlos a mano aquí.</p>
+      <p><%- t('products.favEmpty', { link: `<a class="link" href="/productos">${esc(t('products.favEmptyLink'))}</a>` }) %></p>
     <% } else { %>
-      <h2>Todavía no hay productos</h2>
-      <p>Cuando el administrador publique productos aparecerán aquí.</p>
+      <p><%= t('products.empty') %></p>
     <% } %>
   </div>
 <% } else { %>
-  <p class="muted" role="status"><%= products.length %> <%= products.length === 1 ? 'producto' : 'productos' %></p>
-
-  <div class="products-view" data-view="grid">
-    <div class="products-grid">
-      <% products.forEach((product) => { %>
-        <article class="product-card">
-          <div class="product-card-inner">
-            <div class="product-card-head">
-              <h3><a href="/productos/<%= product.id %>"><%= product.name %></a></h3>
-              <% if (product.producer) { %><p class="product-card-producer"><%= product.producer %></p><% } %>
-            </div>
-            <div class="product-card-badges">
-              <% const tb = typeBadge(product.type); %>
-              <% if (tb) { %><span class="badge badge-<%= tb.tone %>"><%= tb.text %></span><% } %>
-            </div>
-            <% if (product.location) { %>
-              <p class="product-card-location"><%= countries_text(product.location) %></p>
-            <% } %>
-          </div>
-          <div class="product-card-action">
-            <%- include('partials/fav-button', { product }) %>
-          </div>
-        </article>
-      <% }) %>
-    </div>
+  <div class="products-view cards" data-view="grid">
+    <% products.forEach((p) => { %>
+      <article class="card" id="p<%= p.id %>">
+        <h2><a href="/productos/<%= p.id %>"><%= p.name %></a></h2>
+        <% if (p.producer) { %><p class="card-producer"><%= p.producer %></p><% } %>
+        <% if (meta(p)) { %><p class="card-meta"><%= meta(p) %></p><% } %>
+        <%- include('partials/fav-button', { product: p, anchor: `p${p.id}` }) %>
+      </article>
+    <% }) %>
   </div>
 
-  <div class="products-view" data-view="table" hidden>
-    <div class="box table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Nombre</th>
-            <th scope="col">Productor</th>
-            <th scope="col" class="hide-sm">Tipo de producción</th>
-            <th scope="col">País de producción</th>
-            <th scope="col"><span class="sr-only">Favorito</span></th>
+  <div class="products-view box table-wrap" data-view="table" hidden>
+    <table data-sortable>
+      <thead>
+        <tr><th scope="col" data-sort aria-sort="ascending"><%= t('products.name') %></th><th scope="col" data-sort><%= t('products.producer') %></th><th scope="col" class="hide-sm" data-sort><%= t('products.type') %></th><th scope="col" class="hide-sm" data-sort><%= t('products.country') %></th><th scope="col"><span class="sr-only"><%= t('products.favorite') %></span></th></tr>
+      </thead>
+      <tbody>
+        <% products.forEach((p) => { %>
+          <tr id="t<%= p.id %>">
+            <th scope="row"><a href="/productos/<%= p.id %>"><%= p.name %></a></th>
+            <td class="cell-clip" data-value="<%= p.producer || '' %>"><%= p.producer || t('noData') %></td>
+            <td class="hide-sm" data-value="<%= typeLabel(p.type) %>"><%= typeLabel(p.type) || t('noData') %></td>
+            <td class="hide-sm" data-value="<%= p.location ? countries_text(p.location) : '' %>"><%= countries_text(p.location) %></td>
+            <td class="cell-actions"><%- include('partials/fav-button', { product: p, anchor: `t${p.id}` }) %></td>
           </tr>
-        </thead>
-        <tbody>
-          <% products.forEach((product) => { %>
-            <tr>
-              <th scope="row"><a href="/productos/<%= product.id %>"><%= product.name %></a></th>
-              <td><%= product.producer || 'Sin datos' %></td>
-              <td class="hide-sm"><% const tb = typeBadge(product.type); %><% if (tb) { %><span class="badge badge-<%= tb.tone %>"><%= tb.text %></span><% } else { %><span class="muted">Sin datos</span><% } %></td>
-              <td><%= countries_text(product.location) %></td>
-              <td class="cell-actions"><%- include('partials/fav-button', { product }) %></td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <%# Mapa: un marcador por país (más grande cuantos más productos) que lleva a su lista de productos, debajo del mapa. %>
+  <% const byId = new Map(products.map((p) => [p.id, p]));
+     const onMap = places.filter((c) => c.feature && c.feature.center);
+     const maxN = Math.max(1, ...places.map((c) => c.n));
+     const placeId = (c) => 'pais-' + c.label.normalize('NFD').replace(/[^\w]+/g, '-').toLowerCase(); %>
+  <div class="products-view map-view" data-view="map" hidden>
+    <div class="box map-box">
+      <svg class="world" viewBox="0 0 960 424" role="img" aria-label="<%= t('products.mapLabel') %>">
+        <% const has = new Set(onMap.map((c) => c.feature.name)); %>
+        <% world.forEach((f) => { %><path d="<%= f.d %>"<%- has.has(f.name) ? ' class="has"' : '' %>></path><% }) %>
+        <% onMap.slice().reverse().forEach((c) => { const r = 5 + 7 * Math.sqrt(c.n / maxN); %>
+          <a class="pin" href="#<%= placeId(c) %>">
+            <title><%= c.label %>: <%= c.n %></title>
+            <circle class="pin-halo" cx="<%= c.feature.center.x %>" cy="<%= c.feature.center.y %>" r="<%= (r + 5).toFixed(1) %>"/>
+            <circle class="pin-dot" cx="<%= c.feature.center.x %>" cy="<%= c.feature.center.y %>" r="<%= r.toFixed(1) %>"/>
+          </a>
+        <% }) %>
+      </svg>
+    </div>
+    <div class="places">
+      <% places.forEach((c) => { %>
+        <section class="place" id="<%= placeId(c) %>">
+          <h2><%= c.label %> <span class="place-n"><%= c.n %></span><% if (!c.feature) { %> <span class="place-note"><%= t('products.noPlace') %></span><% } %></h2>
+          <ul>
+            <% c.ids.map((id) => byId.get(id)).filter(Boolean).forEach((p) => { %>
+              <li><a href="/productos/<%= p.id %>"><%= p.name %></a><% if (p.producer) { %> <span class="muted">· <%= p.producer %></span><% } %></li>
+            <% }) %>
+          </ul>
+        </section>
+      <% }) %>
     </div>
   </div>
 <% } %>

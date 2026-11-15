@@ -1,0 +1,52 @@
+<%- include('partials/head') %>
+<%# Sobre los datos (textos: data.*): estado del directorio, cómo leer una ficha y de dónde salen los datos.
+    Las etiquetas usan los mismos colores e iconos que la ficha (BADGE_KINDS en fields.js). %>
+<% const legend = [
+     ['production', ['industrial', 'smallScale', 'local', 'theoretical']],
+     ['diet', ['vegan', 'vegetarian']],
+     ['evidence', ['peer', 'grey']],
+     ['unicef', ['unicef']],
+   ]; %>
+<div class="page-head"><h1><%= t('nav.data') %></h1></div>
+
+<section class="data-stats" aria-label="<%= t('nav.data') %>">
+  <div class="box data-stat"><span><%= t('data.products') %></span><strong><%= num(products) %></strong></div>
+  <div class="box data-stat"><span><%= t('data.countries') %></span><strong><%= num(countries) %></strong></div>
+  <% if (updated) { %><div class="box data-stat"><span><%= t('data.updated') %></span><strong class="data-date"><%= longDate(updated) %></strong></div><% } %>
+</section>
+
+<section class="box box-pad data-block" aria-labelledby="t-read">
+  <h2 id="t-read"><%= t('data.readTitle') %></h2>
+  <div class="data-legend">
+    <% legend.forEach(([kind, keys]) => { const k = kinds[kind]; %>
+      <div>
+        <h3><%= t(`data.kinds.${kind}`) %></h3>
+        <dl>
+          <% keys.forEach((key) => { %>
+            <div><dt><span class="badge badge-<%= k.tone %>"><%- icon(k.icon) %><%= t(`badges.${key}`) %></span></dt><dd><%= t(`data.exp.${key}`) %></dd></div>
+          <% }) %>
+        </dl>
+      </div>
+    <% }) %>
+    <div>
+      <h3><%= t('data.kinds.other') %></h3>
+      <dl>
+        <div><dt><span class="badge"><%= t('product.estimated') %></span></dt><dd><%= t('data.exp.estimated') %></dd></div>
+        <div><dt><span class="data-nodata"><%= t('noData') %></span></dt><dd><%= t('data.exp.noData') %></dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="box box-pad data-block" aria-labelledby="t-src">
+  <h2 id="t-src"><%= t('data.sourceTitle') %></h2>
+  <ol class="data-steps">
+    <% [1, 2, 3].forEach((i) => { %><li><span class="step-num">0<%= i %>/</span><h3><%= t(`about.s${i}Title`) %></h3><p><%= t(`about.s${i}Text`) %></p></li><% }) %>
+  </ol>
+</section>
+
+<section class="box box-pad data-cta" aria-labelledby="t-cta">
+  <h2 id="t-cta"><%= t('data.ctaTitle') %></h2>
+  <a class="btn btn-primary" href="/productos?sugerir=1"><%= t('data.ctaBtn') %></a>
+</section>
+<%- include('partials/foot') %>

@@ -1,0 +1,9 @@
+<%- include('partials/head') %>
+<%# RUTFfeed: sección reservada para entradas y posts sobre RUTF. De momento solo avisa de que llegará pronto. Textos: feed.* %>
+<section class="feed-soon">
+  <span class="feed-ico"><%- icon('feed') %></span>
+  <span class="feed-badge"><%= t('feed.soon') %></span>
+  <h1><%= t('feed.title') %></h1>
+  <p><%= t('feed.text') %></p>
+</section>
+<%- include('partials/foot') %>

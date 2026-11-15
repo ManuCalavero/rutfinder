@@ -1,41 +1,85 @@
 <%- include('partials/head') %>
-<section class="poster">
-  <div class="poster-main">
-    <h1>Un mapa<br>compartido<br><span>de RUTF.</span></h1>
-    <div class="poster-side">
-      <p>Alimentos terapéuticos<br>listos para usar.</p>
-      <p class="poster-num"><span>RUTF/</span><span><%= new Date().getFullYear() %></span></p>
-    </div>
+<%# Textos en locales/*.json (home.*). Para poner la imagen de una tarjeta, rellena su «img» (por ejemplo '/comparar.png' en public/) y su «alt».
+    «tone» da el color de fondo de la tarjeta (mint, peach, lilac); «tall» la hace alta a la izquierda en escritorio. %>
+<% const features = [
+     { icon: 'box', tone: 'mint', title: t('home.f1Title'), text: t('home.f1Text'), img: null, alt: '', tall: true },
+     { icon: 'link', tone: 'peach', title: t('home.f2Title'), text: t('home.f2Text'), img: null, alt: '' },
+     { icon: 'users', tone: 'lilac', title: t('home.f3Title'), text: t('home.f3Text'), img: null, alt: '' },
+   ]; %>
+<section class="hero" aria-labelledby="t-hero">
+  <a class="pill rise" href="#proposito"><span class="pill-dot" aria-hidden="true"></span><%= t('home.pill') %><%- icon('next') %></a>
+  <h1 id="t-hero" class="hero-title"><span class="word">RUTF</span><span class="word word-2"><em>inder</em></span></h1>
+  <p class="hero-sub rise"><%= t('home.sub') %></p>
+  <form class="search rise" action="/buscar" method="get" role="search">
+    <label class="sr-only" for="q"><%= t('home.searchLabel') %></label>
+    <input id="q" name="q" type="search" placeholder="<%= t('home.placeholder') %>" maxlength="100" autocomplete="off" required>
+    <button class="btn btn-primary" type="submit"><%= t('home.searchBtn') %></button>
+  </form>
+  <p class="try rise">
+    <% t('home.examples').forEach((ex) => { %><a href="/buscar?q=<%= encodeURIComponent(ex) %>"><%= ex %></a><% }) %>
+  </p>
+  <%# Cómo funciona: tres ilustraciones al estilo de las instrucciones de un sobre de RUTF. %>
+  <ol class="how rise" aria-label="<%= t('home.howLabel') %>">
+    <% t('home.steps').forEach((step, i) => { %>
+      <li><img class="how-ico" src="/images/rutfinder-step-<%= i + 1 %>B.png" width="222" height="222" alt="" decoding="async"><span class="how-label"><span aria-hidden="true"><%= i + 1 %>. </span><%= step %></span></li>
+    <% }) %>
+  </ol>
+</section>
+
+<section class="section-wrap" id="proposito" aria-labelledby="t-proposito">
+  <div class="section-head reveal">
+    <h2 id="t-proposito"><%= t('home.sectionTitle') %></h2>
+    <p><%= t('home.sectionText') %></p>
   </div>
-  <div class="poster-foot">
-    <p class="poster-lead">Rutfinder reúne en un solo lugar los RUTF (<span lang="en">Ready-to-Use Therapeutic Food</span>, como Plumpy'Nut) que existen en distintos países: composición, productor, coste, lugar de producción y fuentes.</p>
-    <p class="actions">
-      <a class="btn btn-primary" href="/registro">Solicitar acceso</a>
-      <a class="btn" href="/login">Iniciar sesión</a>
-    </p>
+  <div class="features">
+    <% features.forEach((f) => { %>
+      <article class="module feature feature-<%= f.tone %> reveal<%= f.tall ? ' feature-tall' : '' %>">
+        <div class="feature-text">
+          <span class="tint tint-<%= f.tone %>"><%- icon(f.icon) %></span>
+          <h3><%= f.title %></h3>
+          <p><%= f.text %></p>
+        </div>
+        <div class="media">
+          <% if (f.img) { %><img src="<%= f.img %>" alt="<%= f.alt %>" loading="lazy"><% } %>
+        </div>
+      </article>
+    <% }) %>
   </div>
 </section>
 
-<div class="grid">
-  <section class="box box-pad">
-    <p class="kicker">01</p>
-    <h2>Qué es</h2>
-    <p>Una base de datos consultable de productos RUTF. Cada producto tiene una ficha con su composición nutricional, ingredientes, productor, coste y enlaces a las fuentes originales.</p>
-    <p>Cuando un dato no está disponible se indica «Sin datos». No se estima ni se rellena nada.</p>
-  </section>
-  <section class="box box-pad">
-    <p class="kicker">02</p>
-    <h2>Para quién es</h2>
-    <p>Para ONG, técnicos de nutrición y profesionales que trabajan en el tratamiento de la desnutrición aguda y necesitan comparar los productos disponibles.</p>
-  </section>
-  <section class="box box-pad">
-    <p class="kicker">03</p>
-    <h2>Cómo pedir acceso</h2>
-    <ol>
-      <li><a href="/registro">Rellena la solicitud</a> con tu nombre, email y organización.</li>
-      <li>Un administrador revisa y aprueba tu solicitud.</li>
-      <li>Inicia sesión para consultar los productos y guardar tus favoritos.</li>
-    </ol>
-  </section>
-</div>
+<section class="section-wrap" id="contacto" aria-labelledby="t-contacto">
+  <div class="module contact reveal">
+    <div class="contact-text">
+      <span class="tint tint-red"><%- icon('mail') %></span>
+      <h2 id="t-contacto"><%= t('home.contactTitle') %></h2>
+      <p><%= t('home.contactText') %></p>
+    </div>
+    <% if (contact.sent) { %>
+      <div class="contact-done" role="status">
+        <span class="contact-check"><%- icon('check') %></span>
+        <h3><%= t('home.sentTitle') %></h3>
+        <p class="muted"><%= t('home.sentText') %></p>
+      </div>
+    <% } else { %>
+      <form method="post" action="/contacto#contacto" class="contact-form">
+        <% if (contact.error) { %><div class="flash flash-error" role="alert"><%= contact.error %></div><% } %>
+        <input type="hidden" name="_csrf" value="<%= csrf() %>">
+        <div class="trap" aria-hidden="true"><label for="web">Web</label><input id="web" name="web" type="text" tabindex="-1" autocomplete="off"></div>
+        <div class="contact-row">
+          <div>
+            <label for="c-name"><%= t('home.name') %></label>
+            <input id="c-name" name="name" type="text" value="<%= contact.values.name || '' %>" maxlength="100" autocomplete="name" required>
+          </div>
+          <div>
+            <label for="c-email"><%= t('home.email') %></label>
+            <input id="c-email" name="email" type="email" value="<%= contact.values.email || '' %>" maxlength="254" autocomplete="email" required>
+          </div>
+        </div>
+        <label for="c-message"><%= t('home.message') %></label>
+        <textarea id="c-message" name="message" rows="5" maxlength="4000" required><%= contact.values.message || '' %></textarea>
+        <button type="submit" class="btn btn-primary btn-block"><%= t('home.send') %></button>
+      </form>
+    <% } %>
+  </div>
+</section>
 <%- include('partials/foot') %>

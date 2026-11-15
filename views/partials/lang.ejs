@@ -1,0 +1,7 @@
+<%# Selector de idioma. up: true -> el menú se abre hacia arriba (en el pie). %>
+<details class="dropdown lang<%= locals.up ? ' lang-up' : '' %>">
+  <summary class="lang-btn" aria-label="<%= t('nav.language') %>: <%= langs[lang].name %>"><%- icon('globe') %><span><%= locals.up ? langs[lang].name : lang.toUpperCase() %></span><%- icon('down') %></summary>
+  <nav class="dropdown-panel menu lang-menu" aria-label="<%= t('nav.language') %>">
+    <% Object.entries(langs).forEach(([code, l]) => { %><a href="<%= langHref(code) %>" hreflang="<%= code %>" lang="<%= code %>" <%- code === lang ? 'aria-current="true"' : '' %>><%= l.name %><% if (code === lang) { %><%- icon('check') %><% } %></a><% }) %>
+  </nav>
+</details>

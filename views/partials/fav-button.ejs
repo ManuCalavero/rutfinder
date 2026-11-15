@@ -1,7 +1,5 @@
-<form method="post" action="/favoritos/<%= product.id %>">
+<form method="post" action="/favoritos/<%= product.id %>" class="fav">
   <input type="hidden" name="_csrf" value="<%= csrf() %>">
-  <input type="hidden" name="volver" value="<%= here %>">
-  <button type="submit" class="btn btn-sm" aria-pressed="<%= product.favorite %>" aria-label="<%= product.favorite ? 'Quitar de favoritos' : 'Guardar en favoritos' %>: <%= product.name %>">
-    <span aria-hidden="true" class="<%= product.favorite ? 'star-on' : '' %>"><%= product.favorite ? '★' : '☆' %></span> <%= product.favorite ? 'Guardado' : 'Guardar' %>
-  </button>
+  <input type="hidden" name="volver" value="<%= here %><%= locals.anchor ? `#${locals.anchor}` : '' %>">
+  <button type="submit" class="star" aria-pressed="<%= product.favorite %>" aria-label="<%= t('fav.label', { name: product.name }) %>" title="<%= t(product.favorite ? 'fav.remove' : 'fav.add') %>"><%- icon('star') %></button>
 </form>

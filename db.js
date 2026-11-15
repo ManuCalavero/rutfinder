@@ -1,5 +1,6 @@
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
+const { expandSearch } = require('./search-terms');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const q = (text, params) => pool.query(text, params);
@@ -17,6 +18,9 @@ CREATE TABLE IF NOT EXISTS users (
   status        TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;
+-- Lo que buscó en la portada antes de pedir acceso: su primer inicio de sesión aterriza en esos resultados.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS signup_search TEXT;
 CREATE TABLE IF NOT EXISTS products (
   id         SERIAL PRIMARY KEY,
   name       TEXT NOT NULL,
@@ -44,6 +48,24 @@ CREATE TABLE IF NOT EXISTS suggestions (
   country    TEXT NOT NULL DEFAULT '',
   notes      TEXT NOT NULL DEFAULT '',
   reviewed   BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Mensajes del formulario de contacto de la portada (cualquier visitante).
+CREATE TABLE IF NOT EXISTS messages (
+  id         SERIAL PRIMARY KEY,
+  name       TEXT NOT NULL,
+  email      TEXT NOT NULL,
+  message    TEXT NOT NULL,
+  answered   BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Cada vez que un usuario compara dos productos (para medir el uso del comparador en el panel).
+-- La pareja se guarda ordenada (product_a < product_b): «A frente a B» y «B frente a A» cuentan como la misma.
+CREATE TABLE IF NOT EXISTS comparisons (
+  id         SERIAL PRIMARY KEY,
+  user_id    INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  product_a  INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  product_b  INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE TABLE IF NOT EXISTS import_drafts (
@@ -93,18 +115,19 @@ const COUNTRY_ROWS = `unnest(string_to_array(p.data->>'${COL.location}', E'\\n')
 
 // state: 'visible' | 'hidden' | 'all'. userId solo se usa para marcar los favoritos de ese usuario.
 async function findProducts({ search = '', country = '', state = 'visible', userId = 0, onlyFavorites = false }) {
-  const like = `%${search.replace(/[\\%_]/g, '\\$&')}%`;
+  // La búsqueda se amplía con su traducción al inglés (search-terms.js): basta con que coincida una.
+  const likes = expandSearch(search).map((t) => `%${t.replace(/[\\%_]/g, '\\$&')}%`);
   const { rows } = await q(
     `SELECT p.id, p.name, p.hidden, p.updated_at, p.data->>'${COL.producer}' AS producer, p.data->>'${COL.type}' AS type,
             p.data->>'${COL.location}' AS location, (f.user_id IS NOT NULL) AS favorite
        FROM products p
        LEFT JOIN favorites f ON f.product_id = p.id AND f.user_id = $1
-      WHERE ($2 = '' OR p.name ILIKE $3 OR EXISTS (SELECT 1 FROM jsonb_each_text(p.data) e WHERE e.value ILIKE $3))
+      WHERE ($2 = '' OR p.name ILIKE ANY($3) OR EXISTS (SELECT 1 FROM jsonb_each_text(p.data) e WHERE e.value ILIKE ANY($3)))
         AND ($4 = '' OR EXISTS (SELECT 1 FROM ${COUNTRY_ROWS} c WHERE trim(c) = $4))
         AND ($5 = 'all' OR p.hidden = ($5 = 'hidden'))
         AND ($6 = false OR f.user_id IS NOT NULL)
       ORDER BY lower(p.name), p.id`,
-    [userId, search, like, country, state, onlyFavorites]
+    [userId, search, likes, country, state, onlyFavorites]
   );
   return rows;
 }

@@ -1,15 +1,11 @@
 <%- include('partials/head') %>
 <div class="page-head">
-  <div>
-    <h1>Usuarios</h1>
-    <p class="muted">Personas con acceso a Rutfinder. Las solicitudes pendientes están en <a href="/admin">Solicitudes</a>.</p>
-  </div>
+  <h1>Usuarios</h1>
   <details class="dropdown" <%= openForm ? 'open' : '' %>>
     <summary class="btn btn-primary">Añadir usuario</summary>
-    <form method="post" action="/admin/usuarios" class="dropdown-panel form">
-      <input type="hidden" name="_csrf" value="<%= csrf() %>">
-      <h2>Nuevo usuario</h2>
+    <form method="post" action="/admin/usuarios" class="dropdown-panel">
       <% if (error) { %><div class="flash flash-error" role="alert"><%= error %></div><% } %>
+      <input type="hidden" name="_csrf" value="<%= csrf() %>">
       <label for="name">Nombre</label>
       <input id="name" name="name" type="text" value="<%= values.name || '' %>" maxlength="100" autocomplete="off" required>
       <label for="email">Email</label>
@@ -21,27 +17,24 @@
         <option value="user">Usuario</option>
         <option value="admin" <%= values.role === 'admin' ? 'selected' : '' %>>Administrador</option>
       </select>
-      <p class="hint">Usuario: consulta productos y guarda favoritos. Administrador: acceso completo al panel.</p>
       <label for="password">Contraseña inicial</label>
-      <input id="password" name="password" type="password" minlength="12" maxlength="72" autocomplete="new-password" aria-describedby="password-help" required>
-      <p id="password-help" class="hint">Mínimo 12 caracteres. Pásasela a esa persona por un canal seguro: la app no envía emails.</p>
-      <button type="submit" class="btn btn-primary btn-block">Añadir usuario</button>
+      <input id="password" name="password" type="password" minlength="12" maxlength="72" autocomplete="new-password" required>
+      <button type="submit" class="btn btn-primary btn-block">Añadir</button>
     </form>
   </details>
 </div>
 
 <div class="box table-wrap">
-  <table>
+  <table data-sortable>
     <thead>
-      <tr><th scope="col">Nombre</th><th scope="col">Email</th><th scope="col" class="hide-sm">Organización</th><th scope="col">Rol</th></tr>
+      <tr><th scope="col" data-sort>Nombre</th><th scope="col" data-sort>Email</th><th scope="col" class="hide-sm" data-sort>Organización</th></tr>
     </thead>
     <tbody>
       <% users.forEach((u) => { %>
         <tr>
-          <th scope="row"><%= u.name %><% if (u.id === user.id) { %> <span class="label label-success">Tú</span><% } %></th>
+          <th scope="row" data-value="<%= u.name %>"><%= u.name %><% if (u.role === 'admin') { %> <span class="badge">Admin</span><% } %></th>
           <td><%= u.email %></td>
           <td class="hide-sm"><%= u.organization %></td>
-          <td><span class="label <%= u.role === 'admin' ? 'label-dark' : 'label-muted' %>"><%= u.role === 'admin' ? 'Administrador' : 'Usuario' %></span></td>
         </tr>
       <% }) %>
     </tbody>
