@@ -1,4 +1,4 @@
-/* Rutfinder — lienzo claro, tinta casi negra y un único color de acción: rojo.
+/* RUTFinder — lienzo claro, tinta casi negra y un único color de acción: rojo.
    El rojo marca lo que se puede hacer o lo que requiere atención (botón principal, avisos, favoritos, foco). */
 :root {
   --ink: #18181a;
@@ -374,7 +374,7 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
   inset: 0 0 auto;
   z-index: -1;
   height: calc(100% - var(--steps));
-  background: url(/images/rtuf-finder-global-index-and-search.png) bottom center / cover no-repeat;
+  background: url(/images/hero-paper-900.webp) bottom center / cover no-repeat;
   pointer-events: none;
 }
 /* Sobre el rojo, los textos van en claro */
@@ -525,6 +525,30 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
 .footer-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 20px; font-size: 14px; border-top: 1px solid var(--f-line); }
 .footer-bottom p { display: flex; align-items: center; gap: 12px; margin: 0; }
 .footer-bottom .brand { font-size: 16px; color: var(--f-ink); }
+.footer-legal { display: flex; gap: 20px; }
+.footer-legal a { transition: color 0.15s; }
+.footer-legal a:hover { color: var(--f-ink); }
+
+/* Nota de privacidad bajo los formularios públicos (contacto y solicitar acceso) */
+.form-note { margin: 12px 0 0; font-size: 13px; line-height: 1.45; color: var(--muted); }
+.form-note .link { color: inherit; }
+
+/* Política de privacidad y aviso legal: una columna de lectura */
+.legal { width: 100%; max-width: 720px; margin: 0 auto; padding-top: 16px; }
+.legal-head { margin-bottom: 32px; }
+.legal-head h1 { margin: 0 0 8px; font-size: clamp(32px, 7.4vw, 48px); line-height: 1.05; }
+.legal-head .muted { margin: 0 0 20px; font-size: 14px; }
+.legal-intro { margin: 0; font-size: 17px; line-height: 1.55; color: var(--muted); }
+.legal-owner { margin-bottom: 40px; padding: 20px 24px; }
+.legal-owner h2 { margin: 0 0 12px; font-size: 18px; }
+.legal-owner dl { display: grid; gap: 8px; margin: 0; }
+.legal-owner dl div { display: grid; grid-template-columns: minmax(0, 140px) minmax(0, 1fr); gap: 12px; }
+.legal-owner dt { color: var(--muted); }
+.legal-owner dd { margin: 0; overflow-wrap: anywhere; }
+.legal-section { padding: 24px 0; border-top: 1px solid var(--line); }
+.legal-section h2 { margin: 0 0 10px; font-size: 22px; line-height: 1.2; }
+.legal-section p { max-width: 68ch; margin: 0 0 10px; line-height: 1.6; }
+.legal-section p:last-child { margin-bottom: 0; }
 
 /* Selector de idioma (cabecera, zona de usuarios y pie) */
 .lang-btn { display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 10px; font-size: 14px; font-weight: 500; color: var(--muted); border-radius: 999px; transition: color 0.15s, background 0.15s; }
@@ -549,6 +573,7 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
 }
 
 @media (min-width: 640px) {
+  .hero::before { background-image: url(/images/hero-paper-1600.webp); }
   .module-pad { padding: 28px; }
   .contact-row { grid-template-columns: 1fr 1fr; }
   .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -934,7 +959,7 @@ input.is-valid:not(:focus) { border-color: #9fcfae; }
 .place li a { font-weight: 500; }
 .place li a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-/* RUTFfeed: aviso de «próximamente» (usuarios y admin) */
+/* RUTFeed: aviso de «próximamente» (usuarios y admin) */
 .feed-soon { display: grid; justify-items: center; gap: 12px; max-width: 560px; margin: 48px auto; padding: 48px 24px; text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; }
 .feed-soon h1 { margin: 0; }
 .feed-soon p { margin: 0; color: var(--muted); line-height: 1.6; }

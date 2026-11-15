@@ -14,6 +14,16 @@ const { FEATURES, countryStats } = require('./world');
 const { LANGS, DEFAULT, COOKIE, T, pickLang } = require('./i18n');
 
 const PROD = process.env.NODE_ENV === 'production';
+// URL pública de la web (para canonical, Open Graph y sitemap). Si no se define, se usa la de la petición.
+const siteUrl = (req) => (process.env.SITE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/+$/, '');
+// Datos del titular para el aviso legal y la política de privacidad (variables LEGAL_* en .env / Render).
+const LEGAL = {
+  name: process.env.LEGAL_NAME || '',
+  id: process.env.LEGAL_ID || '',
+  address: process.env.LEGAL_ADDRESS || '',
+  email: process.env.LEGAL_EMAIL || '',
+};
+const LEGAL_UPDATED = '2026-11-15'; // cámbialo cuando cambie el texto de las páginas legales
 if (!process.env.DATABASE_URL || (process.env.SESSION_SECRET || '').length < 32) {
   console.error('Faltan variables de entorno: DATABASE_URL y SESSION_SECRET (mínimo 32 caracteres). Mira .env.example.');
   process.exit(1);
@@ -48,7 +58,19 @@ app.use((req, res, next) => {
   res.locals.langHref = (code) => `/idioma/${code}?volver=${encodeURIComponent(back)}`;
   res.locals.esc = esc;
   res.locals.year = new Date().getFullYear();
+  res.locals.siteUrl = siteUrl(req);
   next();
+});
+
+// ---------- SEO: páginas indexables, robots.txt y sitemap.xml ----------
+// Solo se indexa la web pública. Lo demás (zona de usuarios, panel, login, búsquedas) lleva noindex en head.ejs.
+app.locals.SEO_PATHS = ['/', '/sobre', '/registro', '/privacidad', '/aviso-legal'];
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(`User-agent: *\nDisallow: /admin\nDisallow: /buscar\nDisallow: /idioma/\nAllow: /\n\nSitemap: ${siteUrl(req)}/sitemap.xml\n`);
+});
+app.get('/sitemap.xml', (req, res) => {
+  const urls = app.locals.SEO_PATHS.map((p) => `  <url><loc>${esc(siteUrl(req) + p)}</loc></url>`).join('\n');
+  res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
 });
 app.get('/idioma/:code', (req, res) => {
   if (LANGS[req.params.code]) {
@@ -220,13 +242,21 @@ app.post('/contacto', contactLimiter, async (req, res) => {
 
 app.get('/sobre', async (req, res) => {
   const products = (await q('SELECT count(*)::int AS n FROM products WHERE NOT hidden')).rows[0].n;
-  res.render('sobre', { title: req.t('about.title'), products, countries: (await listCountries()).length });
+  res.render('sobre', { title: req.t('about.title'), description: req.t('meta.about'), products, countries: (await listCountries()).length });
 });
+
+// Política de privacidad y aviso legal: textos en locales/*.json (legalPages.*), datos del titular en LEGAL.
+for (const [route, key] of [['/privacidad', 'privacy'], ['/aviso-legal', 'legal']]) {
+  app.get(route, (req, res) => res.render('legal', {
+    title: req.t(`legalPages.${key}.title`), description: req.t(`legalPages.${key}.description`),
+    page: req.t(`legalPages.${key}`), owner: LEGAL, updated: LEGAL_UPDATED,
+  }));
+}
 
 // Solicitar acceso. Si viene de buscar en la portada, dice cuántos productos coinciden (solo el número).
 const readSearch = (value) => String(value || '').trim().slice(0, 100);
 const renderRegistro = async (res, { error = null, values = {}, search = '' } = {}) => res.render('registro', {
-  title: res.locals.t('signup.title'), error, values, search,
+  title: res.locals.t('signup.title'), description: res.locals.t('meta.signup'), error, values, search,
   count: search ? (await findProducts({ search })).length : null,
 });
 
@@ -362,7 +392,7 @@ app.get('/comparar', requireMember, async (req, res) => {
   res.render('comparar', { title: req.t('compare.title'), products, a, b, comparison });
 });
 
-// ---------- RUTFfeed: de momento solo avisa de que pronto habrá entradas y posts (usuarios y admin) ----------
+// ---------- RUTFeed: de momento solo avisa de que pronto habrá entradas y posts (usuarios y admin) ----------
 app.get('/feed', requireUser, (req, res) => res.render('feed', { title: req.t('feed.title') }));
 
 // ---------- Sobre los datos: estado del directorio y cómo leer una ficha ----------
@@ -404,7 +434,10 @@ app.use((err, req, res, next) => {
 
 const port = process.env.PORT || 3000;
 init()
-  .then(() => app.listen(port, () => console.log(`Rutfinder escuchando en el puerto ${port}`)))
+  .then(() => app.listen(port, () => {
+    console.log(`RUTFinder escuchando en el puerto ${port}`);
+    if (!LEGAL.name || !LEGAL.email) console.warn('Aviso: faltan LEGAL_NAME y/o LEGAL_EMAIL; el aviso legal y la política de privacidad saldrán sin los datos del titular.');
+  }))
   .catch((err) => {
     console.error('No se pudo iniciar la base de datos:', err.message);
     process.exit(1);

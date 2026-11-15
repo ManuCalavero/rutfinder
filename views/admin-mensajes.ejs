@@ -15,7 +15,7 @@
             <td class="cell-wrap pre"><%= m.message %></td>
             <td class="hide-sm" data-value="<%= new Date(m.created_at).toISOString() %>"><time datetime="<%= new Date(m.created_at).toISOString() %>" title="<%= new Date(m.created_at).toLocaleString('es-ES') %>"><%= hace(m.created_at) %></time></td>
             <td class="cell-actions">
-              <a class="btn btn-sm" href="mailto:<%= m.email %>?subject=<%= encodeURIComponent('Tu mensaje a Rutfinder') %>">Responder</a>
+              <a class="btn btn-sm" href="mailto:<%= m.email %>?subject=<%= encodeURIComponent('Tu mensaje a RUTFinder') %>">Responder</a>
               <form method="post" action="/admin/mensajes/<%= m.id %>/atendido">
                 <input type="hidden" name="_csrf" value="<%= csrf() %>">
                 <button type="submit" class="btn btn-sm" aria-label="Marcar como atendido el mensaje de <%= m.name %>">Atendido</button>

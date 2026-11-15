@@ -25,7 +25,8 @@
   </nav>
   <div class="footer-bottom">
     <%- include('lang', { up: true }) %>
-    <p><a class="brand" href="/"><img src="/logo.svg" alt="" width="20" height="20">rutfinder</a><span>© <%= year %></span></p>
+    <nav class="footer-legal" aria-label="<%= t('footer.legalLabel') %>"><a href="/privacidad"><%= t('footer.privacy') %></a><a href="/aviso-legal"><%= t('footer.legal') %></a></nav>
+    <p><a class="brand" href="/"><img src="/logo.svg" alt="" width="20" height="20">RUTFinder</a><span>© <%= year %></span></p>
   </div>
 </footer>
 <% } %>

@@ -1,0 +1,29 @@
+<%- include('partials/head') %>
+<%# Política de privacidad y aviso legal. Textos: legalPages.privacy.* y legalPages.legal.*; datos del titular: variables LEGAL_* (server.js). %>
+<% const ownerRows = [['ownerName', owner.name], ['ownerId', owner.id], ['ownerAddress', owner.address], ['ownerEmail', owner.email]].filter(([, v]) => v); %>
+<article class="legal">
+  <header class="legal-head">
+    <h1><%= page.title %></h1>
+    <p class="muted"><%= t('legalPages.updated', { date: longDate(updated) }) %></p>
+    <p class="legal-intro"><%= page.intro %></p>
+  </header>
+
+  <% if (ownerRows.length) { %>
+    <section class="module legal-owner" aria-labelledby="t-owner">
+      <h2 id="t-owner"><%= t('legalPages.ownerTitle') %></h2>
+      <dl>
+        <% ownerRows.forEach(([key, value]) => { %>
+          <div><dt><%= t(`legalPages.${key}`) %></dt><dd><% if (key === 'ownerEmail') { %><a class="link" href="mailto:<%= value %>"><%= value %></a><% } else { %><%= value %><% } %></dd></div>
+        <% }) %>
+      </dl>
+    </section>
+  <% } %>
+
+  <% page.sections.forEach((s, i) => { %>
+    <section class="legal-section" aria-labelledby="t-legal-<%= i %>">
+      <h2 id="t-legal-<%= i %>"><%= s.h %></h2>
+      <% s.p.forEach((text) => { %><p><%= text %></p><% }) %>
+    </section>
+  <% }) %>
+</article>
+<%- include('partials/foot') %>

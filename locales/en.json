@@ -13,7 +13,7 @@
     "favorites": "Favourites",
     "compare": "Compare",
     "data": "About the data",
-    "feed": "RUTFfeed"
+    "feed": "RUTFeed"
   },
   "banner": {
     "lead": "Make or know of a RUTF",
@@ -27,13 +27,16 @@
     "write": "Write to us",
     "colDirectory": "Directory",
     "colAccount": "Account",
-    "colCompany": "Rutfinder",
+    "colCompany": "RUTFinder",
     "search": "Search for a RUTF",
     "addProduct": "Have a RUTF? Write to us",
-    "label": "Footer"
+    "label": "Footer",
+    "privacy": "Privacy",
+    "legal": "Legal notice",
+    "legalLabel": "Legal information"
   },
   "home": {
-    "title": "Home",
+    "title": "Global directory of RUTF and therapeutic foods",
     "pill": "The world's largest directory of therapeutic foods",
     "sub": "Every RUTF, in one place.",
     "searchLabel": "Search by country or ingredient",
@@ -51,7 +54,7 @@
       "Choose"
     ],
     "sectionTitle": "Less searching. Better decisions.",
-    "sectionText": "Rutfinder brings together the ready-to-use therapeutic foods made around the world, with their data and their sources.",
+    "sectionText": "RUTFinder brings together the ready-to-use therapeutic foods made around the world, with their data and their sources.",
     "f1Title": "Every product, comparable.",
     "f1Text": "Composition, ingredients, producer and cost, in the same format on every product sheet.",
     "f2Title": "Data with a source.",
@@ -65,7 +68,8 @@
     "name": "Name",
     "email": "Email",
     "message": "Message",
-    "send": "Send message"
+    "send": "Send message",
+    "privacyNote": "We will only use your details to reply to you."
   },
   "signup": {
     "show": "Show password",
@@ -87,7 +91,7 @@
     },
     "ask": "Request access.",
     "why1Title": "For professionals",
-    "why1Text": "Rutfinder is a work tool for NGOs, nutrition teams and health professionals.",
+    "why1Text": "RUTFinder is a work tool for NGOs, nutrition teams and health professionals.",
     "why2Title": "Reviewed by a person",
     "why2Text": "A member of our team reviews every request, so the community stays trustworthy.",
     "why3Title": "We'll let you know",
@@ -98,15 +102,16 @@
     "organization": "Organisation",
     "password": "Password",
     "submit": "Send request",
-    "haveAccount": "Already have an account?"
+    "haveAccount": "Already have an account?",
+    "privacyNote": "We will use your details to review your request and manage your account."
   },
   "about": {
     "title": "About us",
-    "heading": "About Rutfinder",
+    "heading": "About RUTFinder",
     "lead": "We bring together in one place the information on ready-to-use therapeutic foods (RUTF) made around the world, so that choosing one is faster and better informed.",
     "whyTitle": "Why it exists",
     "whyP1": "RUTFs are the standard treatment for severe acute malnutrition in children. But information about them is scattered across reports, scientific papers, manufacturer catalogues and spreadsheets.",
-    "whyP2": "Comparing products means searching many places and reconciling data that each source presents in its own way. Rutfinder does that work once, for everyone.",
+    "whyP2": "Comparing products means searching many places and reconciling data that each source presents in its own way. RUTFinder does that work once, for everyone.",
     "statProducts": "Products",
     "statCountries": "Producing countries",
     "howTitle": "How we work",
@@ -121,8 +126,8 @@
     "ctaSignup": "Request access"
   },
   "login": {
-    "heading": "Log in to Rutfinder",
-    "new": "New to Rutfinder?",
+    "heading": "Log in to RUTFinder",
+    "new": "New to RUTFinder?",
     "newLink": "Request access",
     "title": "Log in",
     "email": "Email",
@@ -298,8 +303,118 @@
     "ctaBtn": "Suggest a change"
   },
   "feed": {
-    "title": "RUTFfeed",
+    "title": "RUTFeed",
     "soon": "Coming soon",
     "text": "Entries and posts about RUTF will be available soon: sector news, studies, producers and experiences from the field."
+  },
+  "meta": {
+    "description": "A directory of the ready-to-use therapeutic foods (RUTF) made around the world: composition, ingredients, producer and cost, with sources. For NGOs and nutrition teams.",
+    "about": "Why RUTFinder exists and how we work: we gather reports, peer-reviewed articles and manufacturer data on every RUTF, without estimating or inventing data.",
+    "signup": "Request access to RUTFinder, the directory of ready-to-use therapeutic foods (RUTF) for NGOs, nutrition teams and health professionals.",
+    "ogAlt": "RUTFinder: every RUTF, in one place.",
+    "ogLine": "The global directory of ready-to-use therapeutic foods"
+  },
+  "legalPages": {
+    "readMore": "Privacy policy",
+    "updated": "Last updated: {date}",
+    "ownerTitle": "Owner",
+    "ownerName": "Name",
+    "ownerId": "Tax ID",
+    "ownerAddress": "Address",
+    "ownerEmail": "Email",
+    "privacy": {
+      "title": "Privacy policy",
+      "description": "What personal data RUTFinder collects, what it is used for, how long it is kept and how to exercise your rights.",
+      "intro": "RUTFinder collects only the data needed for the tool to work. Here is what we collect, why, and what you can do about it.",
+      "sections": [
+        {
+          "h": "Who processes your data",
+          "p": [
+            "The data controller is the owner of RUTFinder, whose details appear above. You can write to us by email or through the contact form."
+          ]
+        },
+        {
+          "h": "What we collect and why",
+          "p": [
+            "Contact form: your name, email and message, so we can read it and reply by email.",
+            "Access request: your name, email, organisation, password (stored encrypted: no one on the team can see it) and, if you came from the search box, what you searched for. We use them to review your request and, if approved, to manage your account.",
+            "Account use: your favourites, the change suggestions you send us, the comparisons you make and the date of your last login. We use them to make the tool work and to improve the directory."
+          ]
+        },
+        {
+          "h": "Legal basis",
+          "p": [
+            "We process contact form data with your consent, which you give by sending it. Account data, because it is needed to provide the service you request. Security measures, such as limiting login attempts, rely on our legitimate interest in protecting the website."
+          ]
+        },
+        {
+          "h": "How long we keep it",
+          "p": [
+            "Messages, for as long as needed to deal with them. Account data, while the account is active or until you ask us to delete it. If we turn down an access request, you can ask us to delete its data at any time."
+          ]
+        },
+        {
+          "h": "Who we share it with",
+          "p": [
+            "We do not sell or hand over your data. The website and its database are hosted by Render (Render Services, Inc.), which acts as data processor. Render is based in the United States, so there may be international data transfers, covered by the European Commission’s standard contractual clauses."
+          ]
+        },
+        {
+          "h": "Cookies",
+          "p": [
+            "We only use technical cookies that the website needs to work: one keeps you logged in (7 days) and another remembers the language you choose (1 year). In the members’ area, your browser also remembers whether you prefer to see products as a grid or a list. We do not use analytics or advertising cookies, so we do not need to ask for your consent."
+          ]
+        },
+        {
+          "h": "Security",
+          "p": [
+            "The connection is encrypted (HTTPS), passwords are stored encrypted and only the team can access the admin panel."
+          ]
+        },
+        {
+          "h": "Your rights",
+          "p": [
+            "You can ask to access, correct or delete your data, object to or restrict its processing, or take it to another service. Write to us by email or through the contact form. If you feel we have not handled your request properly, you can complain to the Spanish Data Protection Agency (aepd.es) or to the data protection authority where you live."
+          ]
+        }
+      ]
+    },
+    "legal": {
+      "title": "Legal notice",
+      "description": "Details of the owner of RUTFinder, terms of use of the website and where the directory’s information comes from.",
+      "intro": "In accordance with Spanish Law 34/2002 on information society services and electronic commerce (LSSI), these are the details of the owner of this website and its terms of use.",
+      "sections": [
+        {
+          "h": "Purpose",
+          "p": [
+            "RUTFinder is an information directory of ready-to-use therapeutic foods (RUTF) for NGOs, nutrition teams and health professionals."
+          ]
+        },
+        {
+          "h": "Content and liability",
+          "p": [
+            "The data on each product comes from public sources (reports, scientific articles, grey literature and manufacturer data) and is linked on each product page. We take care to keep it accurate, but it does not replace the manufacturer’s official information or professional judgement. If you spot an error, let us know and we will review it."
+          ]
+        },
+        {
+          "h": "Intellectual property",
+          "p": [
+            "The design, texts, pictograms and code of RUTFinder belong to its owner. Product names and trademarks belong to their manufacturers."
+          ]
+        },
+        {
+          "h": "External links",
+          "p": [
+            "Product pages link to third-party sources. We are not responsible for their content or availability."
+          ]
+        },
+        {
+          "h": "Applicable law",
+          "p": [
+            "This website is governed by Spanish law."
+          ]
+        }
+      ]
+    }
   }
 }

@@ -13,7 +13,7 @@
     "favorites": "Preferiti",
     "compare": "Confronta",
     "data": "Sui dati",
-    "feed": "RUTFfeed"
+    "feed": "RUTFeed"
   },
   "banner": {
     "lead": "Produci o conosci un RUTF",
@@ -27,13 +27,16 @@
     "write": "Scrivici",
     "colDirectory": "Directory",
     "colAccount": "Account",
-    "colCompany": "Rutfinder",
+    "colCompany": "RUTFinder",
     "search": "Cerca un RUTF",
     "addProduct": "Hai un RUTF? Scrivici",
-    "label": "Piè di pagina"
+    "label": "Piè di pagina",
+    "privacy": "Privacy",
+    "legal": "Note legali",
+    "legalLabel": "Informazioni legali"
   },
   "home": {
-    "title": "Home",
+    "title": "Directory mondiale di RUTF e alimenti terapeutici",
     "pill": "La più grande directory di alimenti terapeutici al mondo",
     "sub": "Tutti i RUTF, in un unico posto.",
     "searchLabel": "Cerca per paese o ingrediente",
@@ -51,7 +54,7 @@
       "Scegli"
     ],
     "sectionTitle": "Meno ricerche. Decisioni migliori.",
-    "sectionText": "Rutfinder riunisce gli alimenti terapeutici pronti all'uso prodotti nel mondo, con i loro dati e le loro fonti.",
+    "sectionText": "RUTFinder riunisce gli alimenti terapeutici pronti all'uso prodotti nel mondo, con i loro dati e le loro fonti.",
     "f1Title": "Tutti i prodotti, confrontabili.",
     "f1Text": "Composizione, ingredienti, produttore e costo, nello stesso formato in ogni scheda.",
     "f2Title": "Dati con fonte.",
@@ -65,7 +68,8 @@
     "name": "Nome",
     "email": "Email",
     "message": "Messaggio",
-    "send": "Invia messaggio"
+    "send": "Invia messaggio",
+    "privacyNote": "Useremo i tuoi dati solo per risponderti."
   },
   "signup": {
     "show": "Mostra password",
@@ -87,7 +91,7 @@
     },
     "ask": "Richiedi l'accesso.",
     "why1Title": "Per professionisti",
-    "why1Text": "Rutfinder è uno strumento di lavoro per ONG, team di nutrizione e professionisti sanitari.",
+    "why1Text": "RUTFinder è uno strumento di lavoro per ONG, team di nutrizione e professionisti sanitari.",
     "why2Title": "Revisione umana",
     "why2Text": "Una persona del team esamina ogni richiesta. Così la comunità resta affidabile.",
     "why3Title": "Ti avvisiamo",
@@ -98,15 +102,16 @@
     "organization": "Organizzazione",
     "password": "Password",
     "submit": "Invia richiesta",
-    "haveAccount": "Hai già un account?"
+    "haveAccount": "Hai già un account?",
+    "privacyNote": "Useremo i tuoi dati per esaminare la tua richiesta e gestire il tuo account."
   },
   "about": {
     "title": "Chi siamo",
-    "heading": "Chi è Rutfinder",
+    "heading": "Chi è RUTFinder",
     "lead": "Riuniamo in un unico posto le informazioni sugli alimenti terapeutici pronti all'uso (RUTF) prodotti nel mondo, perché sceglierne uno sia più rapido e più informato.",
     "whyTitle": "Perché esiste",
     "whyP1": "I RUTF sono il trattamento di riferimento per la malnutrizione acuta grave nei bambini. Ma le informazioni che li riguardano sono sparse tra rapporti, articoli scientifici, cataloghi dei produttori e fogli di calcolo.",
-    "whyP2": "Confrontare i prodotti richiede di cercare in molti posti e di uniformare dati che ogni fonte presenta a modo suo. Rutfinder fa questo lavoro una volta, per tutti.",
+    "whyP2": "Confrontare i prodotti richiede di cercare in molti posti e di uniformare dati che ogni fonte presenta a modo suo. RUTFinder fa questo lavoro una volta, per tutti.",
     "statProducts": "Prodotti",
     "statCountries": "Paesi di produzione",
     "howTitle": "Come lavoriamo",
@@ -121,8 +126,8 @@
     "ctaSignup": "Richiedi l'accesso"
   },
   "login": {
-    "heading": "Accedi a Rutfinder",
-    "new": "Prima volta su Rutfinder?",
+    "heading": "Accedi a RUTFinder",
+    "new": "Prima volta su RUTFinder?",
     "newLink": "Richiedi l'accesso",
     "title": "Accedi",
     "email": "Email",
@@ -298,8 +303,118 @@
     "ctaBtn": "Suggerisci una modifica"
   },
   "feed": {
-    "title": "RUTFfeed",
+    "title": "RUTFeed",
     "soon": "Prossimamente",
     "text": "Presto saranno disponibili articoli e post sui RUTF: novità del settore, studi, produttori ed esperienze sul campo."
+  },
+  "meta": {
+    "description": "Directory degli alimenti terapeutici pronti all’uso (RUTF) prodotti nel mondo: composizione, ingredienti, produttore e costo, con le loro fonti. Per ONG e team di nutrizione.",
+    "about": "Perché esiste RUTFinder e come lavoriamo: raccogliamo rapporti, articoli sottoposti a revisione paritaria e dati dei produttori su ogni RUTF, senza stimare né inventare dati.",
+    "signup": "Richiedi l’accesso a RUTFinder, la directory degli alimenti terapeutici pronti all’uso (RUTF) per ONG, team di nutrizione e professionisti sanitari.",
+    "ogAlt": "RUTFinder: tutti i RUTF, in un unico posto.",
+    "ogLine": "La directory mondiale degli alimenti terapeutici pronti all’uso"
+  },
+  "legalPages": {
+    "readMore": "Informativa sulla privacy",
+    "updated": "Ultimo aggiornamento: {date}",
+    "ownerTitle": "Titolare",
+    "ownerName": "Nome",
+    "ownerId": "Codice fiscale",
+    "ownerAddress": "Indirizzo",
+    "ownerEmail": "Email",
+    "privacy": {
+      "title": "Informativa sulla privacy",
+      "description": "Quali dati personali raccoglie RUTFinder, a cosa servono, per quanto tempo vengono conservati e come esercitare i tuoi diritti.",
+      "intro": "RUTFinder raccoglie solo i dati necessari al funzionamento dello strumento. Ecco quali, perché e cosa puoi farne.",
+      "sections": [
+        {
+          "h": "Chi tratta i tuoi dati",
+          "p": [
+            "Il titolare del trattamento è il titolare di RUTFinder, i cui dati compaiono sopra. Puoi scriverci via email o dal modulo di contatto."
+          ]
+        },
+        {
+          "h": "Quali dati raccogliamo e perché",
+          "p": [
+            "Modulo di contatto: il tuo nome, la tua email e il tuo messaggio, per leggerlo e risponderti via email.",
+            "Richiesta di accesso: il tuo nome, la tua email, la tua organizzazione, la tua password (conservata cifrata: nessuno del team può vederla) e, se arrivi dal motore di ricerca, ciò che hai cercato. Servono per esaminare la richiesta e, se approvata, gestire il tuo account.",
+            "Uso dell’account: i tuoi preferiti, i suggerimenti di modifica che ci invii, i confronti che fai e la data del tuo ultimo accesso. Servono al funzionamento dello strumento e a migliorare la directory."
+          ]
+        },
+        {
+          "h": "Base giuridica",
+          "p": [
+            "Trattiamo i dati del modulo di contatto con il tuo consenso, che dai inviandolo. Quelli dell’account, perché sono necessari per fornirti il servizio richiesto. Le misure di sicurezza, come limitare i tentativi di accesso, si basano sul nostro legittimo interesse a proteggere il sito."
+          ]
+        },
+        {
+          "h": "Per quanto tempo li conserviamo",
+          "p": [
+            "I messaggi, per il tempo necessario a gestirli. I dati dell’account, finché è attivo o finché non ci chiedi di cancellarlo. Se rifiutiamo una richiesta di accesso, puoi chiederci di cancellarne i dati in qualsiasi momento."
+          ]
+        },
+        {
+          "h": "Con chi li condividiamo",
+          "p": [
+            "Non vendiamo né cediamo i tuoi dati. Il sito e il suo database sono ospitati da Render (Render Services, Inc.), che agisce come responsabile del trattamento. Render ha sede negli Stati Uniti, quindi possono esserci trasferimenti internazionali di dati, tutelati dalle clausole contrattuali tipo della Commissione europea."
+          ]
+        },
+        {
+          "h": "Cookie",
+          "p": [
+            "Usiamo solo cookie tecnici, necessari al funzionamento del sito: uno mantiene la sessione aperta (7 giorni) e un altro ricorda la lingua scelta (1 anno). Nell’area utenti, il browser ricorda anche se preferisci vedere i prodotti a griglia o a elenco. Non usiamo cookie di analisi né pubblicitari, quindi non serve il tuo consenso."
+          ]
+        },
+        {
+          "h": "Sicurezza",
+          "p": [
+            "La connessione è cifrata (HTTPS), le password sono conservate cifrate e solo il team può accedere al pannello di amministrazione."
+          ]
+        },
+        {
+          "h": "I tuoi diritti",
+          "p": [
+            "Puoi chiederci di accedere ai tuoi dati, rettificarli, cancellarli, opporti al loro trattamento, limitarlo o trasferirli a un altro servizio. Scrivici via email o dal modulo di contatto. Se ritieni che la tua richiesta non sia stata gestita correttamente, puoi presentare reclamo all’Agenzia spagnola per la protezione dei dati (aepd.es) o al Garante per la protezione dei dati personali."
+          ]
+        }
+      ]
+    },
+    "legal": {
+      "title": "Note legali",
+      "description": "Dati del titolare di RUTFinder, condizioni d’uso del sito e origine delle informazioni della directory.",
+      "intro": "Ai sensi della legge spagnola 34/2002 sui servizi della società dell’informazione e sul commercio elettronico (LSSI), questi sono i dati del titolare di questo sito e le sue condizioni d’uso.",
+      "sections": [
+        {
+          "h": "Oggetto",
+          "p": [
+            "RUTFinder è una directory di informazioni sugli alimenti terapeutici pronti all’uso (RUTF), rivolta a ONG, team di nutrizione e professionisti sanitari."
+          ]
+        },
+        {
+          "h": "Contenuti e responsabilità",
+          "p": [
+            "I dati di ogni prodotto provengono da fonti pubbliche (rapporti, articoli scientifici, letteratura grigia e dati dei produttori) e sono collegati in ogni scheda. Ci impegniamo perché siano corretti, ma non sostituiscono le informazioni ufficiali del produttore né il giudizio professionale. Se noti un errore, segnalacelo e lo verificheremo."
+          ]
+        },
+        {
+          "h": "Proprietà intellettuale",
+          "p": [
+            "Il design, i testi, i pittogrammi e il codice di RUTFinder appartengono al suo titolare. I nomi e i marchi dei prodotti appartengono ai rispettivi produttori."
+          ]
+        },
+        {
+          "h": "Link esterni",
+          "p": [
+            "Le schede rimandano a fonti di terzi. Non siamo responsabili del loro contenuto né della loro disponibilità."
+          ]
+        },
+        {
+          "h": "Legge applicabile",
+          "p": [
+            "Questo sito è regolato dalla legge spagnola."
+          ]
+        }
+      ]
+    }
   }
 }

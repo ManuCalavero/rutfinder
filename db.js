@@ -95,7 +95,7 @@ async function ensureAdmin() {
   }
   await q(
     `INSERT INTO users (name, email, password_hash, organization, role, status)
-     VALUES ('Administrador', $1, $2, 'Rutfinder', 'admin', 'approved')
+     VALUES ('Administrador', $1, $2, 'RUTFinder', 'admin', 'approved')
      ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, role = 'admin', status = 'approved'`,
     [email, await bcrypt.hash(password, 12)]
   );

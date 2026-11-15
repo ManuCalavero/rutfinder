@@ -78,6 +78,7 @@
         <label for="c-message"><%= t('home.message') %></label>
         <textarea id="c-message" name="message" rows="5" maxlength="4000" required><%= contact.values.message || '' %></textarea>
         <button type="submit" class="btn btn-primary btn-block"><%= t('home.send') %></button>
+        <p class="form-note"><%= t('home.privacyNote') %> <a class="link" href="/privacidad"><%= t('legalPages.readMore') %></a></p>
       </form>
     <% } %>
   </div>

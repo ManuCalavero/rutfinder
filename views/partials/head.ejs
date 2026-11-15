@@ -4,11 +4,34 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f3f0">
-  <title><%= title %> · Rutfinder</title>
+  <%# SEO: descripción, canonical y Open Graph. Solo la web pública (SEO_PATHS en server.js) se indexa; el resto lleva noindex. %>
+  <% const fullTitle = `${title} · RUTFinder`;
+     const desc = locals.description || t('meta.description');
+     const indexable = !user && !locals.bare && SEO_PATHS.includes(path); %>
+  <title><%= fullTitle %></title>
+  <meta name="description" content="<%= desc %>">
+  <% if (indexable) { %><link rel="canonical" href="<%= siteUrl + path %>"><% } else { %><meta name="robots" content="noindex"><% } %>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="RUTFinder">
+  <meta property="og:title" content="<%= fullTitle %>">
+  <meta property="og:description" content="<%= desc %>">
+  <meta property="og:url" content="<%= siteUrl + path %>">
+  <meta property="og:image" content="<%= siteUrl %>/images/og-<%= lang %>.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="<%= t('meta.ogAlt') %>">
+  <meta property="og:locale" content="<%= langs[lang].locale.replace('-', '_') %>">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <% if (!user) { %>
   <link rel="preload" href="/fonts/roboto-condensed-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <% if (path === '/') { %><link rel="preload" href="/fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin><% } %>
+  <% if (path === '/') { %>
+  <link rel="preload" href="/fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <%# Fondo de papel rojo de la cabecera: es lo primero que se pinta, así que se pide antes que el CSS lo descubra %>
+  <link rel="preload" href="/images/hero-paper-900.webp" as="image" type="image/webp" media="(max-width: 639px)" fetchpriority="high">
+  <link rel="preload" href="/images/hero-paper-1600.webp" as="image" type="image/webp" media="(min-width: 640px)" fetchpriority="high">
+  <% } %>
   <% } %>
   <link rel="stylesheet" href="/style.css">
   <script src="/app.js" defer></script>
@@ -22,13 +45,13 @@
    const waiting = counts.pending + counts.suggestions + counts.messages; %>
 <div class="shell">
   <aside class="sidebar">
-    <a class="brand" href="/admin"><img src="/logo.svg" alt="" width="28" height="28">rutfinder</a>
+    <a class="brand" href="/admin"><img src="/logo.svg" alt="" width="28" height="28">RUTFinder</a>
     <nav class="side-nav" aria-label="Principal">
       <p class="side-label">Principal</p>
       <a href="/admin" <%- cur(path === '/admin') %>><%- icon('home') %>Inicio</a>
       <a href="/admin/productos" <%- cur(path.startsWith('/admin/productos') || path.startsWith('/productos')) %>><%- icon('box') %>Productos</a>
       <a href="/admin/usuarios" <%- cur(path === '/admin/usuarios') %>><%- icon('users') %>Usuarios</a>
-      <a href="/feed" <%- cur(path === '/feed') %>><%- icon('feed') %>RUTFfeed</a>
+      <a href="/feed" <%- cur(path === '/feed') %>><%- icon('feed') %>RUTFeed</a>
       <p class="side-label">Bandeja</p>
       <% inbox.forEach(([href, ico, text, n, what]) => { %>
         <a href="<%= href %>" <%- cur(path.startsWith(href) || (href === '/admin/solicitudes' && path.endsWith('/rechazar'))) %>><%- icon(ico) %><%= text %><% if (n) { %><span class="count"><%= n %><span class="sr-only"> <%= what %></span></span><% } %></a>
@@ -57,7 +80,7 @@
 <% } else if (user) { %>
 <%# Usuarios: catálogo y favoritos %>
 <header class="header">
-  <a class="brand" href="/productos"><img src="/logo.svg" alt="" width="24" height="24">rutfinder</a>
+  <a class="brand" href="/productos"><img src="/logo.svg" alt="" width="24" height="24">RUTFinder</a>
   <nav class="nav" aria-label="<%= t('nav.main') %>">
     <a href="/productos" <%- cur(path.startsWith('/productos')) %>><%= t('nav.products') %></a>
     <a href="/favoritos" <%- cur(path === '/favoritos') %>><%= t('nav.favorites') %></a>
@@ -72,7 +95,7 @@
 <% } else if (locals.bare) { %>
 <%# Páginas sueltas (login): solo el logo y el selector de idioma, sin menú ni pie %>
 <header class="bare-header">
-  <a class="brand" href="/"><img src="/logo.svg" alt="" width="26" height="26">rutfinder</a>
+  <a class="brand" href="/"><img src="/logo.svg" alt="" width="26" height="26">RUTFinder</a>
   <%- include('lang') %>
 </header>
 <main id="contenido" class="bare-main">
@@ -82,7 +105,7 @@
 <a class="banner" href="/#contacto"><span class="banner-ico"><%- icon('box') %></span><%= t('banner.lead') %><span class="hide-sm"><%= t('banner.more') %></span><%= t('banner.end') %> <span class="banner-cta"><%= t('banner.cta') %><%- icon('next') %></span></a>
 <header class="site-header">
   <div class="site-header-in">
-    <a class="brand" href="/"><img src="/logo.svg" alt="" width="26" height="26">rutfinder</a>
+    <a class="brand" href="/"><img src="/logo.svg" alt="" width="26" height="26">RUTFinder</a>
     <nav class="site-nav" aria-label="<%= t('nav.main') %>">
       <% links.forEach(([href, text]) => { %><a href="<%= href %>" <%- cur(path === href) %>><%= text %></a><% }) %>
     </nav>
