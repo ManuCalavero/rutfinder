@@ -327,7 +327,10 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
 .public .btn { border-radius: 999px; }
 
 /* Friso y menú */
-.banner { display: block; padding: 9px 16px; font-size: 13px; line-height: 1.4; text-align: center; color: rgba(255, 255, 255, 0.72); background: var(--ink); }
+.banner { display: block; padding: 13px 16px; font-size: 13px; line-height: 1.4; text-align: center; color: rgba(255, 255, 255, 0.9); background: var(--red); transition: background 0.15s; }
+.banner:hover { background: var(--red-dark); }
+.banner-ico { display: inline-flex; margin-right: 8px; vertical-align: top; }
+.banner-ico .icon { width: 18px; height: 18px; color: #fff; }
 .banner-cta { display: inline-flex; align-items: center; gap: 2px; margin-left: 6px; font-weight: 500; color: #fff; vertical-align: top; }
 .banner-cta .icon { width: 14px; height: 14px; transition: transform 0.15s; }
 .banner:hover .banner-cta .icon { transform: translateX(2px); }
@@ -353,7 +356,7 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
   width: calc(100% - 32px);
   max-width: 1088px;
   margin: 4px auto 0;
-  padding: 28px 12px 20px;
+  padding: 20px 12px 16px;
   text-align: center;
   position: relative;
   isolation: isolate;
@@ -362,7 +365,7 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
   border: 1px solid var(--line);
   border-radius: 28px;
   /* Alto de la zona blanca de abajo, donde van los pasos: el papel rojo termina justo encima */
-  --steps: 150px;
+  --steps: 126px;
 }
 /* Papel rojo rasgado de fondo en los ~2/3 de arriba; el borde rasgado queda al pie, justo antes de los pasos */
 .hero::before {
@@ -378,9 +381,12 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
 .hero .hero-title { color: #fff; }
 .hero .hero-title em { color: #e8e4de; }
 .hero .hero-sub { color: rgba(255, 255, 255, 0.88); }
-.hero .try a { color: var(--ink); border-color: transparent; }
+.hero .try a { color: #fff; background: transparent; border-color: rgba(255, 255, 255, 0.55); }
+.hero .try a:hover { color: #fff; background: rgba(255, 255, 255, 0.12); border-color: #fff; }
+.hero .pill { background: rgba(226, 241, 229, 0.8); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.hero .pill:hover { background: rgba(212, 234, 218, 0.92); }
 /* Cómo funciona: tres pictogramas con el sobre rojo y su verbo, unidos por una línea discontinua */
-.how { --ico: 72px; --gap: 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); width: 100%; max-width: 640px; margin: 30px 0 0; padding: 14px 12px 12px; list-style: none; background: var(--surface); border-radius: 18px; }
+.how { --ico: 72px; --gap: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); width: 100%; max-width: 640px; margin: 18px 0 0; padding: 14px 12px 12px; list-style: none; background: var(--surface); border-radius: 18px; }
 .how li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .how li + li::before { content: ""; position: absolute; top: calc(var(--ico) / 2); right: calc(50% + var(--ico) / 2 + 8px); width: calc(100% + var(--gap) - var(--ico) - 16px); border-top: 2px dashed rgba(24, 24, 26, 0.22); }
 .how-ico { display: block; width: var(--ico); height: var(--ico); object-fit: contain; }
@@ -391,7 +397,7 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
 .pill-dot { position: relative; flex: none; width: 7px; height: 7px; background: var(--green-dot); border-radius: 50%; }
 .pill .icon { width: 15px; height: 15px; transition: transform 0.15s; }
 .pill:hover .icon { transform: translateX(2px); }
-.public .hero-title { margin: 0; font-weight: 900; letter-spacing: -0.02em; font-size: clamp(56px, 19vw, 140px); line-height: 0.95; white-space: nowrap; }
+.public .hero-title { margin: 0; font-weight: 900; letter-spacing: -0.02em; font-size: clamp(56px, 19vw, 110px); line-height: 0.95; white-space: nowrap; }
 .hero-title .word { display: inline-block; }
 .hero-title em { font-family: var(--font-serif); font-size: 1.12em; font-style: italic; font-weight: 400; letter-spacing: -0.01em; color: var(--muted); }
 .hero-sub { margin: -4px 0 6px; font-family: var(--font-display); font-size: clamp(18px, 4.8vw, 26px); font-weight: 400; line-height: 1.25; color: var(--muted); }
@@ -405,7 +411,7 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
 .search-sm { max-width: 440px; box-shadow: none; }
 .search-sm input, .search-sm .btn { height: 36px; }
 .try { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0; }
-.try a { padding: 5px 13px; font-size: 13px; font-weight: 500; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; transition: color 0.15s, border-color 0.15s, transform 0.15s; }
+.try a { padding: 5px 13px; font-size: 13px; font-weight: 500; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.15s; }
 .try a:hover { color: var(--ink); border-color: #c9c6bf; transform: translateY(-1px); }
 
 /* Módulos blancos sobre el lienzo */
@@ -564,9 +570,9 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
   .site-nav { display: flex; gap: 2px; }
   .site-login { display: inline-block; }
   .site-menu { display: none; }
-  .hero { --steps: 196px; gap: 16px; width: calc(100% - 48px); max-width: 1072px; margin-top: 8px; padding: 48px 24px 32px; border-radius: 40px; }
-  .public .hero-title { font-size: 120px; }
-  .how { --ico: 96px; --gap: 64px; max-width: 760px; margin-top: 72px; padding: 16px 32px 12px; border-radius: 22px; }
+  .hero { --steps: 160px; gap: 12px; width: calc(100% - 48px); max-width: 1072px; margin-top: 8px; padding: 28px 24px 20px; border-radius: 40px; }
+  .public .hero-title { font-size: 110px; }
+  .how { --ico: 96px; --gap: 40px; max-width: 680px; margin-top: 32px; padding: 16px 32px 12px; border-radius: 22px; }
   .how-label { font-size: 15px; }
   .search { padding: 6px; }
   .search input, .search .btn { height: 48px; }
@@ -594,6 +600,10 @@ th[aria-sort="ascending"] .sort-down, th[aria-sort="descending"] .sort-up { opac
   .site-footer { width: calc(100% - 48px); padding: 64px 0 28px; }
   .footer-top { gap: 32px; padding-bottom: 88px; }
   .footer-cols { grid-template-columns: repeat(4, minmax(0, 1fr)); padding-bottom: 64px; }
+}
+
+@media (min-width: 1600px) {
+  .public .hero-title { font-size: 120px; }
 }
 
 /* Movimiento: entradas suaves al cargar y al hacer scroll. Nada se mueve si el sistema pide menos movimiento. */

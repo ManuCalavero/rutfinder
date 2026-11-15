@@ -79,7 +79,7 @@
 <% } else { %>
 <%# Web pública: friso, menú y pie (foot.ejs) %>
 <% const links = [['/#proposito', t('nav.what')], ['/sobre', t('nav.about')], ['/#contacto', t('nav.contact')]]; %>
-<a class="banner" href="/#contacto"><%= t('banner.lead') %><span class="hide-sm"><%= t('banner.more') %></span><%= t('banner.end') %> <span class="banner-cta"><%= t('banner.cta') %><%- icon('next') %></span></a>
+<a class="banner" href="/#contacto"><span class="banner-ico"><%- icon('box') %></span><%= t('banner.lead') %><span class="hide-sm"><%= t('banner.more') %></span><%= t('banner.end') %> <span class="banner-cta"><%= t('banner.cta') %><%- icon('next') %></span></a>
 <header class="site-header">
   <div class="site-header-in">
     <a class="brand" href="/"><img src="/logo.svg" alt="" width="26" height="26">rutfinder</a>
