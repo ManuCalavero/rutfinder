@@ -1,11 +1,5 @@
 <%- include('partials/head') %>
-<%# Textos en locales/*.json (home.*). Para poner la imagen de una tarjeta, rellena su «img» (por ejemplo '/comparar.png' en public/) y su «alt».
-    «tone» da el color de fondo de la tarjeta (mint, peach, lilac); «tall» la hace alta a la izquierda en escritorio. %>
-<% const features = [
-     { icon: 'box', tone: 'mint', title: t('home.f1Title'), text: t('home.f1Text'), img: null, alt: '', tall: true },
-     { icon: 'link', tone: 'peach', title: t('home.f2Title'), text: t('home.f2Text'), img: null, alt: '' },
-     { icon: 'users', tone: 'lilac', title: t('home.f3Title'), text: t('home.f3Text'), img: null, alt: '' },
-   ]; %>
+<%# Textos en locales/*.json (home.*). %>
 <section class="hero" aria-labelledby="t-hero">
   <a class="pill rise" href="#proposito"><span class="pill-dot" aria-hidden="true"></span><%= t('home.pill') %><%- icon('next') %></a>
   <h1 id="t-hero" class="hero-title"><span class="word">RUTF</span><span class="word word-2"><em>inder</em></span></h1>
@@ -15,9 +9,7 @@
     <input id="q" name="q" type="search" placeholder="<%= t('home.placeholder') %>" maxlength="100" autocomplete="off" required>
     <button class="btn btn-primary" type="submit"><%= t('home.searchBtn') %></button>
   </form>
-  <p class="try rise">
-    <% t('home.examples').forEach((ex) => { %><a href="/buscar?q=<%= encodeURIComponent(ex) %>"><%= ex %></a><% }) %>
-  </p>
+  <p class="try rise" aria-hidden="true"><%- icon('up') %><%= t('home.hint') %></p>
   <%# Cómo funciona: tres ilustraciones al estilo de las instrucciones de un sobre de RUTF. %>
   <ol class="how rise" aria-label="<%= t('home.howLabel') %>">
     <% t('home.steps').forEach((step, i) => { %>
@@ -31,19 +23,51 @@
     <h2 id="t-proposito"><%= t('home.sectionTitle') %></h2>
     <p><%= t('home.sectionText') %></p>
   </div>
+  <%# Tres tarjetas altas: icono arriba, una pieza de interfaz que ilustra la idea en medio (decorativa) y título y texto abajo. %>
   <div class="features">
-    <% features.forEach((f) => { %>
-      <article class="module feature feature-<%= f.tone %> reveal<%= f.tall ? ' feature-tall' : '' %>">
-        <div class="feature-text">
-          <span class="tint tint-<%= f.tone %>"><%- icon(f.icon) %></span>
-          <h3><%= f.title %></h3>
-          <p><%= f.text %></p>
+    <article class="fcard reveal">
+      <span class="fcard-logo"><%- icon('swap') %></span>
+      <div class="fcard-art" aria-hidden="true">
+        <div class="art-code">
+          <p class="art-code-head">RUTF A <span>⇄</span> RUTF B</p>
+          <% ['nutrition', 'production', 'impact', 'evidence'].forEach((g) => { %><p><span class="art-check">✓</span><%= t(`groups.${g}`) %></p><% }) %>
         </div>
-        <div class="media">
-          <% if (f.img) { %><img src="<%= f.img %>" alt="<%= f.alt %>" loading="lazy"><% } %>
+      </div>
+      <div class="fcard-text"><h3><%= t('home.f1Title') %></h3><p><%= t('home.f1Text') %></p></div>
+    </article>
+
+    <article class="fcard reveal">
+      <span class="fcard-logo"><%- icon('link') %></span>
+      <div class="fcard-art" aria-hidden="true">
+        <div class="art-stack">
+          <p class="art-pill"><%- icon('globe') %><%- icon('evidence') %><span><%= t('home.mock.sources') %></span><%- icon('down') %></p>
+          <ul class="art-list">
+            <li><%- icon('feed') %><span><%= t('home.mock.src1') %></span><i class="art-toggle"></i></li>
+            <li class="on"><%- icon('evidence') %><span><%= t('home.mock.src2') %></span><i class="art-toggle"></i></li>
+            <li><%- icon('production') %><span><%= t('home.mock.src3') %></span><i class="art-toggle"></i></li>
+            <li><%- icon('impact') %><span><%= t('groups.impact') %></span><em><%= t('noData') %></em></li>
+          </ul>
         </div>
-      </article>
-    <% }) %>
+      </div>
+      <div class="fcard-text"><h3><%= t('home.f2Title') %></h3><p><%= t('home.f2Text') %></p></div>
+    </article>
+
+    <article class="fcard reveal">
+      <span class="fcard-logo"><%- icon('users') %></span>
+      <div class="fcard-art" aria-hidden="true">
+        <div class="art-stack art-stack-wide">
+          <p class="art-input"><%- icon('plus') %><span><%= t('signup.organization') %>…</span></p>
+          <ul class="art-menu">
+            <li><%- icon('users') %><%= t('home.mock.org1') %></li>
+            <li><%- icon('nutrition') %><%= t('home.mock.org2') %></li>
+            <li class="on"><%- icon('general') %><%= t('home.mock.org3') %></li>
+            <li class="art-sep"></li>
+            <li><%- icon('check') %><%= t('signup.why2Title') %></li>
+          </ul>
+        </div>
+      </div>
+      <div class="fcard-text"><h3><%= t('home.f3Title') %></h3><p><%= t('home.f3Text') %></p></div>
+    </article>
   </div>
 </section>
 

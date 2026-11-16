@@ -37,16 +37,12 @@
   },
   "home": {
     "title": "Directorio mundial de RUTF y alimentos terapéuticos",
-    "pill": "El directorio más grande de alimentos del mundo",
+    "pill": "129 RUTF de 28 países",
     "sub": "Todos los RUTF, en un solo lugar.",
     "searchLabel": "Busca por país o ingrediente",
     "placeholder": "País o ingrediente",
     "searchBtn": "Buscar",
-    "examples": [
-      "cacahuete",
-      "Kenia",
-      "sorgo"
-    ],
+    "hint": "Busca por ingrediente, país…",
     "howLabel": "Cómo funciona",
     "steps": [
       "Busca",
@@ -61,7 +57,7 @@
     "f2Text": "Cada dato enlaza a su origen. Si no se conoce, la ficha lo dice.",
     "f3Title": "Para quien trata la desnutrición.",
     "f3Text": "ONG, equipos de nutrición y profesionales sanitarios. Una persona del equipo revisa cada acceso.",
-    "contactTitle": "Hablemos.",
+    "contactTitle": "Escríbenos, te leemos.",
     "contactText": "¿Fabricas un RUTF, conoces uno que no está en el directorio o quieres colaborar? Escríbenos y te responderemos por email.",
     "sentTitle": "Mensaje enviado",
     "sentText": "Gracias. Te responderemos por email.",
@@ -69,7 +65,16 @@
     "email": "Email",
     "message": "Mensaje",
     "send": "Enviar mensaje",
-    "privacyNote": "Usaremos tus datos solo para responderte."
+    "privacyNote": "Usaremos tus datos solo para responderte.",
+    "mock": {
+      "sources": "Fuentes",
+      "src1": "Informe técnico",
+      "src2": "Artículo científico",
+      "src3": "Fabricante",
+      "org1": "ONG",
+      "org2": "Equipo de nutrición",
+      "org3": "Profesional sanitario"
+    }
   },
   "signup": {
     "show": "Mostrar contraseña",

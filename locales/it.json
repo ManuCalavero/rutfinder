@@ -37,16 +37,12 @@
   },
   "home": {
     "title": "Directory mondiale di RUTF e alimenti terapeutici",
-    "pill": "La più grande directory di alimenti terapeutici al mondo",
+    "pill": "129 RUTF da 28 paesi",
     "sub": "Tutti i RUTF, in un unico posto.",
     "searchLabel": "Cerca per paese o ingrediente",
     "placeholder": "Paese o ingrediente",
     "searchBtn": "Cerca",
-    "examples": [
-      "arachidi",
-      "Kenya",
-      "sorgo"
-    ],
+    "hint": "Cerca per ingrediente, paese…",
     "howLabel": "Come funziona",
     "steps": [
       "Cerca",
@@ -61,7 +57,7 @@
     "f2Text": "Ogni dato rimanda alla sua origine. Se non è noto, la scheda lo dice.",
     "f3Title": "Per chi cura la malnutrizione.",
     "f3Text": "ONG, team di nutrizione e professionisti sanitari. Una persona del team esamina ogni richiesta.",
-    "contactTitle": "Parliamone.",
+    "contactTitle": "Scrivici, ti leggiamo.",
     "contactText": "Produci un RUTF, ne conosci uno che non è nella directory o vuoi collaborare? Scrivici e ti risponderemo via email.",
     "sentTitle": "Messaggio inviato",
     "sentText": "Grazie. Ti risponderemo via email.",
@@ -69,7 +65,16 @@
     "email": "Email",
     "message": "Messaggio",
     "send": "Invia messaggio",
-    "privacyNote": "Useremo i tuoi dati solo per risponderti."
+    "privacyNote": "Useremo i tuoi dati solo per risponderti.",
+    "mock": {
+      "sources": "Fonti",
+      "src1": "Rapporto tecnico",
+      "src2": "Articolo scientifico",
+      "src3": "Produttore",
+      "org1": "ONG",
+      "org2": "Team di nutrizione",
+      "org3": "Professionista sanitario"
+    }
   },
   "signup": {
     "show": "Mostra password",

@@ -37,16 +37,12 @@
   },
   "home": {
     "title": "Annuaire mondial des RUTF et aliments thérapeutiques",
-    "pill": "Le plus grand annuaire d'aliments thérapeutiques au monde",
+    "pill": "129 RUTF de 28 pays",
     "sub": "Tous les RUTF, au même endroit.",
     "searchLabel": "Rechercher par pays ou ingrédient",
     "placeholder": "Pays ou ingrédient",
     "searchBtn": "Rechercher",
-    "examples": [
-      "arachide",
-      "Kenya",
-      "sorgho"
-    ],
+    "hint": "Recherchez par ingrédient, pays…",
     "howLabel": "Comment ça marche",
     "steps": [
       "Chercher",
@@ -61,7 +57,7 @@
     "f2Text": "Chaque donnée renvoie à son origine. Si elle est inconnue, la fiche l'indique.",
     "f3Title": "Pour celles et ceux qui traitent la malnutrition.",
     "f3Text": "ONG, équipes de nutrition et professionnels de santé. Une personne de l'équipe examine chaque demande.",
-    "contactTitle": "Parlons-en.",
+    "contactTitle": "Écrivez-nous, on vous lit.",
     "contactText": "Vous fabriquez un RUTF, en connaissez un absent de l'annuaire ou souhaitez collaborer ? Écrivez-nous, nous vous répondrons par e-mail.",
     "sentTitle": "Message envoyé",
     "sentText": "Merci. Nous vous répondrons par e-mail.",
@@ -69,7 +65,16 @@
     "email": "E-mail",
     "message": "Message",
     "send": "Envoyer le message",
-    "privacyNote": "Nous utiliserons vos données uniquement pour vous répondre."
+    "privacyNote": "Nous utiliserons vos données uniquement pour vous répondre.",
+    "mock": {
+      "sources": "Sources",
+      "src1": "Rapport technique",
+      "src2": "Article scientifique",
+      "src3": "Fabricant",
+      "org1": "ONG",
+      "org2": "Équipe de nutrition",
+      "org3": "Professionnel de santé"
+    }
   },
   "signup": {
     "show": "Afficher le mot de passe",

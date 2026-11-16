@@ -37,16 +37,12 @@
   },
   "home": {
     "title": "Global directory of RUTF and therapeutic foods",
-    "pill": "The world's largest directory of therapeutic foods",
+    "pill": "129 RUTFs from 28 countries",
     "sub": "Every RUTF, in one place.",
     "searchLabel": "Search by country or ingredient",
     "placeholder": "Country or ingredient",
     "searchBtn": "Search",
-    "examples": [
-      "peanut",
-      "Kenya",
-      "sorghum"
-    ],
+    "hint": "Search by ingredient, country…",
     "howLabel": "How it works",
     "steps": [
       "Search",
@@ -61,7 +57,7 @@
     "f2Text": "Every figure links to where it came from. If it isn't known, the sheet says so.",
     "f3Title": "For those who treat malnutrition.",
     "f3Text": "NGOs, nutrition teams and health professionals. A member of our team reviews every request.",
-    "contactTitle": "Let's talk.",
+    "contactTitle": "Drop us a line, we read everything.",
     "contactText": "Do you make a RUTF, know of one that isn't in the directory, or want to work with us? Write to us and we'll reply by email.",
     "sentTitle": "Message sent",
     "sentText": "Thank you. We'll reply by email.",
@@ -69,7 +65,16 @@
     "email": "Email",
     "message": "Message",
     "send": "Send message",
-    "privacyNote": "We will only use your details to reply to you."
+    "privacyNote": "We will only use your details to reply to you.",
+    "mock": {
+      "sources": "Sources",
+      "src1": "Technical report",
+      "src2": "Scientific article",
+      "src3": "Manufacturer",
+      "org1": "NGO",
+      "org2": "Nutrition team",
+      "org3": "Health professional"
+    }
   },
   "signup": {
     "show": "Show password",
