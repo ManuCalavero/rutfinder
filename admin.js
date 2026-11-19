@@ -4,7 +4,8 @@ const ExcelJS = require('exceljs');
 const bcrypt = require('bcryptjs');
 const { pool, q, getFields, findProducts, listCountries, readFilters } = require('./db');
 const { FEATURES, countryStats } = require('./world');
-const { groupFields } = require('./fields');
+const { groupFields, isUnicef } = require('./fields');
+const standards = require('./standards');
 
 const SHEET = 'RUTF';
 // El Excel se procesa en memoria: nunca se escribe en el disco del servidor.
@@ -161,9 +162,19 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
   router.get('/productos', async (req, res) => {
     const filters = readFilters(req.query);
     const state = ['visible', 'hidden'].includes(req.query.estado) ? req.query.estado : 'all';
+    // Semáforo de normas: cada producto con su resumen, cifras de arriba y filtro ?normas=fuera|faltan|unicef.
+    const all = (await findProducts({ ...filters, state })).map((p) => ({ ...p, std: standards.evaluate(p.specs), isUnicef: isUnicef(p.unicef) }));
+    const normas = ['fuera', 'faltan', 'unicef'].includes(req.query.normas) ? req.query.normas : '';
+    const keep = { fuera: (p) => p.std.summary.all.out > 0, faltan: (p) => p.std.summary.all.none > 0, unicef: (p) => p.isUnicef }[normas];
     res.render('admin-productos', {
-      title: 'Productos', ...filters, state,
-      products: await findProducts({ ...filters, state }),
+      title: 'Productos', ...filters, state, normas,
+      products: keep ? all.filter(keep) : all,
+      stdStats: {
+        complete: all.filter((p) => p.std.summary.all.none === 0).length,
+        out: all.filter((p) => p.std.summary.all.out > 0).length,
+        missing: all.filter((p) => p.std.summary.all.none > 0).length,
+        empty: all.filter((p) => !p.std.hasData).length,
+      },
       countries: await listCountries(true),
       pendingImport: (await q('SELECT 1 FROM import_drafts WHERE user_id = $1', [req.user.id])).rowCount > 0,
       openImport: req.query.importar === '1', // «Importar Excel» del menú lateral abre el formulario
@@ -250,20 +261,24 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
     res.status(status).render('admin-producto-form', {
       title: product.id ? `Editar ${product.name}` : 'Nuevo producto',
       product, groups: groupFields(await getFields(), product.data), error,
+      // Semáforo de normas: estado de cada valor y valores que ya aparecen en el texto del Excel.
+      std: standards.evaluate(product.specs), suggestions: standards.suggest(product.data, product.specs),
+      sources: standards.SOURCES,
     });
 
-  router.get('/productos/nuevo', (req, res) => renderForm(res, { id: null, name: '', data: {} }));
+  router.get('/productos/nuevo', (req, res) => renderForm(res, { id: null, name: '', data: {}, specs: {} }));
 
   router.post('/productos', async (req, res) => {
     const { name, data } = readProductForm(req.body, await getFields());
-    if (!name || name.length > 300) return renderForm(res, { id: null, name, data }, 'El nombre es obligatorio (máximo 300 caracteres).', 400);
-    const { rows } = await q('INSERT INTO products (name, data) VALUES ($1, $2) RETURNING id', [name, JSON.stringify(data)]);
+    const specs = standards.readSpecs(req.body);
+    if (!name || name.length > 300) return renderForm(res, { id: null, name, data, specs }, 'El nombre es obligatorio (máximo 300 caracteres).', 400);
+    const { rows } = await q('INSERT INTO products (name, data, specs) VALUES ($1, $2, $3) RETURNING id', [name, JSON.stringify(data), JSON.stringify(specs)]);
     flash(req, 'success', `Producto «${name}» creado.`);
     res.redirect(`/productos/${rows[0].id}`);
   });
 
   router.get('/productos/:id/editar', async (req, res) => {
-    const product = (await q('SELECT id, name, data FROM products WHERE id = $1', [req.params.id])).rows[0];
+    const product = (await q('SELECT id, name, data, specs FROM products WHERE id = $1', [req.params.id])).rows[0];
     if (!product) return notFound(res);
     renderForm(res, product);
   });
@@ -272,8 +287,9 @@ module.exports = ({ verifyCsrf, authLimiter }) => {
     const previous = (await q('SELECT id, data FROM products WHERE id = $1', [req.params.id])).rows[0];
     if (!previous) return notFound(res);
     const { name, data } = readProductForm(req.body, await getFields(), previous.data);
-    if (!name || name.length > 300) return renderForm(res, { id: previous.id, name, data }, 'El nombre es obligatorio (máximo 300 caracteres).', 400);
-    await q('UPDATE products SET name = $1, data = $2, updated_at = now() WHERE id = $3', [name, JSON.stringify(data), previous.id]);
+    const specs = standards.readSpecs(req.body);
+    if (!name || name.length > 300) return renderForm(res, { id: previous.id, name, data, specs }, 'El nombre es obligatorio (máximo 300 caracteres).', 400);
+    await q('UPDATE products SET name = $1, data = $2, specs = $3, updated_at = now() WHERE id = $4', [name, JSON.stringify(data), JSON.stringify(specs), previous.id]);
     flash(req, 'success', `Ficha de «${name}» guardada.`);
     res.redirect(`/productos/${previous.id}`);
   });

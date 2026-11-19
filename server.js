@@ -8,7 +8,8 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
 const { pool, q, init, getFields, findProducts, listCountries, readFilters } = require('./db');
-const { groupFields, badges, BADGE_KINDS, typeLabel, firstUrl, kvRows, readEstimated } = require('./fields');
+const { groupFields, badges, BADGE_KINDS, typeLabel, firstUrl, kvRows, readEstimated, unicefInfo } = require('./fields');
+const standards = require('./standards');
 const { compareProducts } = require('./compare');
 const { FEATURES, countryStats } = require('./world');
 const { LANGS, DEFAULT, COOKIE, T, pickLang } = require('./i18n');
@@ -48,6 +49,17 @@ const setLang = (req, res, lang) => {
   res.locals.typeLabel = (value) => typeLabel(value, t);
   res.locals.countries_text = (value) => (value || '').split('\n').map((s) => s.trim()).filter(Boolean).join(', ') || t('noData');
   res.locals.num = (n) => n.toLocaleString(LANGS[lang].locale);
+  // Número con decimales (semáforo de normas): numd(11.2, 1) → «11,2»; con trim, sin ceros de relleno: numd(10, 1, true) → «10».
+  const numd = (n, d = 0, trim = false) => Number(n).toLocaleString(LANGS[lang].locale, { minimumFractionDigits: trim ? 0 : d, maximumFractionDigits: d });
+  res.locals.numd = numd;
+  res.locals.stdRange = (c) => standards.rangeText(c, t, numd);
+  res.locals.stdValue = (row) => standards.valueText(row, t, numd);
+  // Etiqueta de estado: icono + texto, nunca solo color. «Presente» en vez de «Por encima» para Salmonella.
+  res.locals.stdChip = (row) => {
+    const tone = row.status === 'in' ? 'in' : row.status === 'none' ? 'none' : 'out';
+    const label = row.kind === 'absence' && row.status === 'high' ? t('standards.present') : t(`standards.status.${row.status}`);
+    return `<span class="std-chip std-${tone}">${app.locals.icon({ in: 'check', out: 'x', none: 'minus' }[tone])}${esc(label)}</span>`;
+  };
   res.locals.longDate = (d) => new Date(d).toLocaleDateString(LANGS[lang].locale, { day: 'numeric', month: 'long', year: 'numeric' });
 };
 app.use((req, res, next) => {
@@ -64,7 +76,7 @@ app.use((req, res, next) => {
 
 // ---------- SEO: páginas indexables, robots.txt y sitemap.xml ----------
 // Solo se indexa la web pública. Lo demás (zona de usuarios, panel, login, búsquedas) lleva noindex en head.ejs.
-app.locals.SEO_PATHS = ['/', '/sobre', '/registro', '/privacidad', '/aviso-legal'];
+app.locals.SEO_PATHS = ['/', '/sobre', '/normas', '/registro', '/privacidad', '/aviso-legal'];
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain').send(`User-agent: *\nDisallow: /admin\nDisallow: /buscar\nDisallow: /idioma/\nAllow: /\n\nSitemap: ${siteUrl(req)}/sitemap.xml\n`);
 });
@@ -150,6 +162,11 @@ const ICONS = {
   impact: 'M12 3v18M16.5 7.5c0-1.7-2-3-4.5-3s-4.5 1.3-4.5 3S9 10.5 12 11s4.5 1.8 4.5 3.5-2 3-4.5 3-4.5-1.3-4.5-3',
   evidence: 'M9 12l2 2 4-4M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z',
   other: 'M4 6h16M4 12h16M4 18h10',
+  // Semáforo de normas
+  standards: 'M12 4v16M8 20h8M5 7h14M5 7l-2.5 6a2.5 2.5 0 005 0zM19 7l-2.5 6a2.5 2.5 0 005 0z',
+  x: 'M7 7l10 10M17 7L7 17',
+  minus: 'M6 12h12',
+  arrow: 'M5 12h14M13 6l6 6-6 6',
 };
 app.locals.icon = (name) => `<svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="${ICONS[name]}"/></svg>`;
 
@@ -254,11 +271,18 @@ for (const [route, key] of [['/privacidad', 'privacy'], ['/aviso-legal', 'legal'
   }));
 }
 
+// Normas y guías oficiales sobre RUTF, con los rangos que usa el semáforo de las fichas (standards.js).
+app.get('/normas', (req, res) => res.render('normas', {
+  title: req.t('standards.title'), description: req.t('meta.standards'),
+  checks: standards.CHECKS, guides: standards.GUIDES, reviewed: standards.REVIEWED,
+}));
+
 // Solicitar acceso. Si viene de buscar en la portada, dice cuántos productos coinciden (solo el número).
 const readSearch = (value) => String(value || '').trim().slice(0, 100);
 const renderRegistro = async (res, { error = null, values = {}, search = '' } = {}) => res.render('registro', {
   title: res.locals.t('signup.title'), description: res.locals.t('meta.signup'), error, values, search,
   count: search ? (await findProducts({ search })).length : null,
+  total: (await q('SELECT count(*)::int AS n FROM products WHERE NOT hidden')).rows[0].n, // «13 de los 128 RUTF del directorio»
 });
 
 app.get('/registro', (req, res) => (req.user ? res.redirect(homeOf(req.user)) : renderRegistro(res)));
@@ -351,6 +375,7 @@ app.get('/productos/:id', requireUser, async (req, res) => {
     title: product.name, product, here: req.originalUrl,
     groups: groupFields(await getFields(), product.data, req.t),
     badges: badges(product.data, req.t), source: firstUrl(product.data),
+    std: standards.evaluate(product.specs), unicef: unicefInfo(product.data),
   });
 });
 

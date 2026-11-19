@@ -1,5 +1,8 @@
 <%- include('partials/head') %>
-<% const filtered = search || country || state !== 'all'; %>
+<% const filtered = search || country || state !== 'all' || normas;
+   // Enlace a esta misma lista con otro filtro de normas (conserva búsqueda, país y estado).
+   const withNormas = (value) => '/admin/productos?' + new URLSearchParams(Object.entries({ q: search, pais: country, estado: state === 'all' ? '' : state, normas: value }).filter(([, v]) => v)).toString();
+   const stdBar = (s) => [['in', s.in], ['out', s.out], ['none', s.none]].filter(([, n]) => n).map(([k, n]) => `<i class="b-${k}" style="flex: ${n}"></i>`).join(''); %>
 <div class="page-head">
   <h1>Productos</h1>
   <div class="actions">
@@ -19,6 +22,14 @@
   <div class="flash flash-warn" role="status">Hay una importación sin confirmar. <a href="/admin/productos/importar">Revisar</a></div>
 <% } %>
 
+<%# Semáforo de normas: cifras que filtran la lista al pulsarlas %>
+<div class="stats std-stats">
+  <div class="box stat"><span class="stat-label">Semáforo completo</span><span class="stat-value"><%= stdStats.complete %></span></div>
+  <a class="box stat<%= stdStats.out ? ' stat-alert' : '' %>" href="<%= withNormas('fuera') %>"><span class="stat-label">Algún valor fuera de rango</span><span class="stat-value"><%= stdStats.out %></span></a>
+  <a class="box stat" href="<%= withNormas('faltan') %>"><span class="stat-label">Les falta algún dato</span><span class="stat-value"><%= stdStats.missing %></span></a>
+  <div class="box stat"><span class="stat-label">Sin ningún dato todavía</span><span class="stat-value"><%= stdStats.empty %></span></div>
+</div>
+
 <form method="get" action="/admin/productos" class="filters" role="search">
   <input name="q" type="search" value="<%= search %>" maxlength="100" placeholder="Buscar" aria-label="Buscar">
   <select name="pais" aria-label="País de producción">
@@ -30,6 +41,12 @@
     <option value="visible" <%= state === 'visible' ? 'selected' : '' %>>Visibles</option>
     <option value="hidden" <%= state === 'hidden' ? 'selected' : '' %>>Ocultos</option>
   </select>
+  <select name="normas" aria-label="Normas">
+    <option value="">Todas las normas</option>
+    <option value="fuera" <%= normas === 'fuera' ? 'selected' : '' %>>Algún valor fuera de rango</option>
+    <option value="faltan" <%= normas === 'faltan' ? 'selected' : '' %>>Les falta algún dato</option>
+    <option value="unicef" <%= normas === 'unicef' ? 'selected' : '' %>>Proveedores de UNICEF</option>
+  </select>
   <button type="submit" class="btn">Filtrar</button>
   <% if (filtered) { %><a class="link" href="/admin/productos">Limpiar</a><% } %>
 </form>
@@ -40,7 +57,7 @@
   <div class="box table-wrap">
     <table data-sortable>
       <thead>
-        <tr><th scope="col" data-sort aria-sort="ascending">Nombre</th><th scope="col" class="hide-sm" data-sort>Productor</th><th scope="col" class="hide-sm" data-sort>País</th><th scope="col"><span class="sr-only">Acciones</span></th></tr>
+        <tr><th scope="col" data-sort aria-sort="ascending">Nombre</th><th scope="col" class="hide-sm" data-sort>Productor</th><th scope="col" class="hide-sm" data-sort>País</th><th scope="col" class="hide-sm" data-sort>UNICEF</th><th scope="col" data-sort>Normas</th><th scope="col"><span class="sr-only">Acciones</span></th></tr>
       </thead>
       <tbody>
         <% products.forEach((p) => { %>
@@ -48,6 +65,16 @@
             <th scope="row" data-value="<%= p.name %>"><a href="/productos/<%= p.id %>"><%= p.name %></a><% if (p.hidden) { %> <span class="badge badge-red">Oculto</span><% } %></th>
             <td class="hide-sm cell-clip" data-value="<%= p.producer || '' %>"><%= p.producer || 'Sin datos' %></td>
             <td class="hide-sm" data-value="<%= p.location ? countries_text(p.location) : '' %>"><%= countries_text(p.location) %></td>
+            <td class="hide-sm" data-value="<%= p.isUnicef ? 'a' : '' %>"><% if (p.isUnicef) { %><span class="badge badge-amber">Proveedor</span><% } else { %><span class="muted">No</span><% } %></td>
+            <% const s = p.std.summary.all; %>
+            <td class="std-cell" data-value="<%= p.std.hasData ? String(s.in).padStart(2, '0') : '' %>">
+              <% if (p.std.hasData) { %>
+                <span class="std-bar" aria-hidden="true"><%- stdBar(s) %></span>
+                <span class="std-cell-text"><%= s.in %> de <%= s.total %> dentro<%= s.out ? ` · ${s.out} fuera` : '' %></span>
+              <% } else { %>
+                <span class="muted">Sin datos</span>
+              <% } %>
+            </td>
             <td class="cell-actions">
               <a class="btn btn-sm" href="/admin/productos/<%= p.id %>/editar" aria-label="Editar <%= p.name %>">Editar</a>
               <% if (p.hidden) { %>

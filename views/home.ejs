@@ -68,6 +68,33 @@
       </div>
       <div class="fcard-text"><h3><%= t('home.f3Title') %></h3><p><%= t('home.f3Text') %></p></div>
     </article>
+
+    <%# Tarjeta ancha: el semáforo de normas (standards.js). Normas en texto, sin logos: sus emblemas no se pueden usar sin permiso. %>
+    <article class="fcard fcard-wide reveal">
+      <div class="fcard-main">
+        <span class="fcard-logo"><%- icon('standards') %></span>
+        <div class="fcard-text"><h3><%= t('home.f4Title') %></h3><p><%= t('home.f4Text') %></p></div>
+        <ul class="norm-list" aria-label="<%= t('home.f4NormsLabel') %>">
+          <% t('home.f4Norms').forEach((n) => { %><li><%- icon('evidence') %><%= n %></li><% }) %>
+        </ul>
+        <p class="fcard-more"><a class="link" href="/normas"><%= t('home.f4Link') %></a><%- icon('next') %></p>
+        <p class="fcard-note"><%= t('home.f4Note') %></p>
+      </div>
+      <div class="fcard-art" aria-hidden="true">
+        <div class="art-std">
+          <div class="art-std-tile">
+            <p><%= t('standards.groups.composition') %></p>
+            <p class="art-std-value"><%= t('standards.inRange', { n: 7, total: 9 }) %></p>
+            <span class="std-bar"><i class="b-in" style="flex: 7"></i><i class="b-out" style="flex: 1"></i><i class="b-none" style="flex: 1"></i></span>
+          </div>
+          <ul class="art-list art-std-list">
+            <% [['energy', `${numd(545)} kcal`, 'in', 'check'], ['protein', `${numd(10.9, 1)} %`, 'in', 'check'], ['n3', `${numd(55)} mg`, 'out', 'x', 'low'], ['moisture', '—', 'none', 'minus']].forEach(([key, value, tone, ico, status]) => { %>
+              <li><span><%= t(`standards.params.${key}`) %></span><b><%= value %></b><span class="std-chip std-<%= tone %>"><%- icon(ico) %><%= t(`standards.status.${status || tone}`) %></span></li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+    </article>
   </div>
 </section>
 

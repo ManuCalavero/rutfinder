@@ -1,0 +1,51 @@
+<%- include('partials/head') %>
+<%# Normas y guías oficiales sobre RUTF. Textos: standards.* en locales; enlaces, rangos y fecha de revisión: standards.js. %>
+<article class="legal norms">
+  <header class="legal-head">
+    <h1><%= t('standards.heading') %></h1>
+    <p class="muted"><%= t('standards.reviewed', { date: longDate(reviewed) }) %></p>
+    <p class="legal-intro"><%= t('standards.lead') %></p>
+  </header>
+
+  <section class="norms-block" aria-labelledby="t-guides">
+    <h2 id="t-guides"><%= t('standards.guidesTitle') %></h2>
+    <%# Cada guía como la portada de un libro (decorativa) con la descripción y el enlace debajo. El enlace cubre también la portada. %>
+    <ul class="guides">
+      <% guides.forEach((g) => { %>
+        <li class="guide">
+          <div class="book book-<%= g.tone %>" aria-hidden="true">
+            <span class="book-org"><%= t(`standards.guides.${g.id}.org`) %></span>
+            <span class="book-title"><%= t(`standards.guides.${g.id}.title`) %></span>
+            <span class="book-foot"><span class="book-code"><%= g.code %></span><% if (g.year) { %><span class="book-year"><%= g.year %></span><% } %></span>
+          </div>
+          <h3 class="sr-only"><%= t(`standards.guides.${g.id}.title`) %> (<%= t(`standards.guides.${g.id}.org`) %><%= g.year ? `, ${g.year}` : '' %>)</h3>
+          <p class="guide-text"><%= t(`standards.guides.${g.id}.text`) %></p>
+          <a class="link guide-link" href="<%= g.url %>" target="_blank" rel="noopener noreferrer"><%= t('standards.open') %><%- icon('external') %></a>
+        </li>
+      <% }) %>
+    </ul>
+  </section>
+
+  <section class="norms-block" id="rangos" aria-labelledby="t-how">
+    <h2 id="t-how"><%= t('standards.howTitle') %></h2>
+    <p><%= t('standards.howText') %></p>
+    <div class="box table-wrap">
+      <table class="std-table">
+        <thead>
+          <tr><th scope="col"><%= t('standards.colParam') %></th><th scope="col"><%= t('standards.colRange') %></th><th scope="col"><%= t('standards.colSource') %></th></tr>
+        </thead>
+        <tbody>
+          <% ['composition', 'safety'].forEach((g) => { %>
+            <tr class="std-group-row"><th scope="rowgroup" colspan="3"><%= t(`standards.groups.${g}`) %></th></tr>
+            <% checks.filter((c) => c.group === g).forEach((c) => { %>
+              <tr><th scope="row"><%= t(`standards.params.${c.key}`) %></th><td class="std-num"><%= stdRange(c) %></td><td><%= c.refs.map((x) => t(`standards.refs.${x}`)).join(' · ') %></td></tr>
+            <% }) %>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <p class="std-note"><%= t('standards.notCert') %></p>
+    <p class="std-note"><%= t('standards.other') %></p>
+  </section>
+</article>
+<%- include('partials/foot') %>

@@ -23,11 +23,16 @@
   </div>
 </header>
 
+<% const specs = product.specs || {}; %>
 <% if (!groups.length) { %>
-  <div class="box blankslate"><p><%= t('noData') %>.</p></div>
+  <div class="sections">
+    <%- include('partials/standards', { std, unicef, specs }) %>
+    <div class="box blankslate"><p><%= t('noData') %>.</p></div>
+  </div>
 <% } else { %>
 <div class="product-layout">
   <div class="sections">
+    <%- include('partials/standards', { std, unicef, specs }) %>
     <% groups.forEach((g) => { %>
       <section class="box section" id="<%= g.id %>" aria-labelledby="t-<%= g.id %>">
         <h2 id="t-<%= g.id %>"><%- icon(g.id) %><%= g.title %></h2>
@@ -51,7 +56,7 @@
       </section>
     <% }) %>
   </div>
-  <%- include('partials/toc', { groups }) %>
+  <%- include('partials/toc', { groups: [{ id: 'standards', title: t('standards.section'), filled: std.hasData || unicef.approved }, ...groups] }) %>
 </div>
 <% } %>
 <%- include('partials/foot') %>

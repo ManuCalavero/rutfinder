@@ -1,6 +1,6 @@
 <% const initials = user.name.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase(); %>
 <details class="dropdown account">
-  <summary aria-label="<%= t('account.label', { name: user.name }) %>"><span class="avatar" aria-hidden="true"><%= initials %></span><span class="account-name"><%= user.name %><% if (user.role === 'admin') { %><small><%= user.email %></small><% } %></span><% if (user.role === 'admin') { %><%- icon('down') %><% } %></summary>
+  <summary aria-label="<%= t('account.label', { name: user.name }) %>"><span class="avatar" aria-hidden="true"><%= initials %></span><span class="account-name"><%= user.name %><small><%= user.email %></small></span><%- icon('down') %></summary>
   <div class="dropdown-panel menu">
     <p class="menu-who"><strong><%= user.name %></strong><span><%= user.email %></span></p>
     <% if (user.role === 'admin') { %><a href="/admin/cuenta"><%= t('account.mine') %></a><% } %>

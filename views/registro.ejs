@@ -1,35 +1,36 @@
 <%- include('partials/head') %>
-<%# Solicitar acceso, en un único bloque como el de «Hablemos»: resultado y motivos a la izquierda, formulario a la derecha.
+<%# Registro, en un único bloque como el de «Hablemos»: resultado y motivos a la izquierda, formulario a la derecha.
     Si se llega desde el buscador de la portada, arriba solo se dice cuántos productos coinciden. Textos: signup.* %>
 <% const found = search && count > 0; %>
 <div class="access">
   <div class="module access-grid">
     <div class="access-main">
-      <% if (search) { %>
-        <section class="match rise" aria-labelledby="t-match">
+      <%# Un solo panel, tan alto como el formulario: arriba el resultado y la invitación a registrarse; abajo, por qué hay que registrarse. %>
+      <div class="access-panel">
+        <div class="access-top">
+          <%# El número es el titular: coincidencias de la búsqueda o, sin búsqueda, el total del directorio. %>
+          <h1 class="access-count rise">
+            <span class="count-n<%= search && !found ? ' is-zero' : '' %>"><%= num(search ? count : total) %></span>
+            <span class="count-label"><%= search ? t('signup.matches', { count, q: search }) : t('signup.totalLabel') %></span>
+          </h1>
           <% if (found) { %>
-            <span class="match-check"><%- icon('check') %></span>
-            <h1 id="t-match"><%- t('signup.found', { count, n: `<span class="match-n">${count}</span>`, q: esc(search) }) %></h1>
-          <% } else { %>
-            <div>
-              <h1 id="t-match"><%= t('signup.none', { q: search }) %></h1>
-              <p><%= t('signup.noneHelp') %> <a class="link" href="/#contacto"><%= t('signup.noneLink') %></a></p>
-            </div>
+            <p class="count-sub"><%= t('signup.ofTotal', { n: num(total) }) %></p>
+          <% } else if (search) { %>
+            <p class="count-sub"><%= t('signup.noneTotal', { n: num(total) }) %> <%= t('signup.noneHelp') %> <a class="link" href="/#contacto"><%= t('signup.noneLink') %></a></p>
           <% } %>
+          <%# La flecha apunta al formulario: a la derecha en escritorio, hacia abajo en móvil. %>
+          <p class="access-cta"><%- icon('arrow') %><span><%= found ? t('signup.askFound', { n: count }) : t('signup.ask') %></span></p>
+          <p class="access-free"><%= t('signup.free') %></p>
+        </div>
+        <section class="access-why" aria-labelledby="t-why">
+          <h2 id="t-why"><%= t('signup.whyTitle') %></h2>
+          <ul class="why">
+            <li><span class="tint tint-mint"><%- icon('users') %></span><div><h3><%= t('signup.why1Title') %></h3><p><%= t('signup.why1Text') %></p></div></li>
+            <li><span class="tint tint-sun"><%- icon('evidence') %></span><div><h3><%= t('signup.why2Title') %></h3><p><%= t('signup.why2Text') %></p></div></li>
+            <li><span class="tint tint-lilac"><%- icon('mail') %></span><div><h3><%= t('signup.why3Title') %></h3><p><%= t(found ? 'signup.why3TextFound' : 'signup.why3Text') %></p></div></li>
+          </ul>
         </section>
-      <% } %>
-      <section class="access-why">
-        <% if (search) { %>
-          <h2><%= found ? t('signup.askFound', { n: count }) : t('signup.ask') %></h2>
-        <% } else { %>
-          <h1><%= t('signup.title') %></h1>
-        <% } %>
-        <ul class="why">
-          <li><span class="tint tint-mint"><%- icon('users') %></span><div><h3><%= t('signup.why1Title') %></h3><p><%= t('signup.why1Text') %></p></div></li>
-          <li><span class="tint tint-sun"><%- icon('evidence') %></span><div><h3><%= t('signup.why2Title') %></h3><p><%= t('signup.why2Text') %></p></div></li>
-          <li><span class="tint tint-lilac"><%- icon('mail') %></span><div><h3><%= t('signup.why3Title') %></h3><p><%= t(found ? 'signup.why3TextFound' : 'signup.why3Text') %></p></div></li>
-        </ul>
-      </section>
+      </div>
     </div>
 
     <div class="access-form">

@@ -14,6 +14,7 @@
         <label for="name">Nombre</label>
         <input id="name" name="name" type="text" value="<%= product.name %>" maxlength="300" required>
       </div>
+      <%- include('partials/standards-form', { product, std, suggestions, sources }) %>
       <% groups.forEach((g) => { %>
         <section class="box section" id="<%= g.id %>" aria-labelledby="t-<%= g.id %>">
           <h2 id="t-<%= g.id %>"><%- icon(g.id) %><%= g.title %></h2>
@@ -32,7 +33,7 @@
         <a class="btn" href="<%= back %>">Cancelar</a>
       </div>
     </div>
-    <% if (groups.length) { %><%- include('partials/toc', { groups }) %><% } %>
+    <%- include('partials/toc', { groups: [{ id: 'standards', title: 'Normas', filled: std.hasData }, ...groups] }) %>
   </div>
 </form>
 <%- include('partials/foot') %>

@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS products (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- Datos del semáforo de normas (standards.js): números que escribe el admin. Van aparte de data para que importar el Excel no los borre.
+ALTER TABLE products ADD COLUMN IF NOT EXISTS specs JSONB NOT NULL DEFAULT '{}';
 CREATE TABLE IF NOT EXISTS fields (
   position INTEGER PRIMARY KEY,
   name     TEXT NOT NULL UNIQUE
@@ -110,7 +112,7 @@ async function init() {
 const getFields = async () => (await q('SELECT name FROM fields ORDER BY position')).rows.map((r) => r.name);
 
 // Columnas del Excel que se usan en las tablas de productos y en el filtro por país.
-const COL = { producer: 'Producer', type: 'Type of production', location: 'Production location' };
+const COL = { producer: 'Producer', type: 'Type of production', location: 'Production location', unicef: 'UNICEF supplier' };
 const COUNTRY_ROWS = `unnest(string_to_array(p.data->>'${COL.location}', E'\\n'))`;
 
 // state: 'visible' | 'hidden' | 'all'. userId solo se usa para marcar los favoritos de ese usuario.
@@ -119,7 +121,7 @@ async function findProducts({ search = '', country = '', state = 'visible', user
   const likes = expandSearch(search).map((t) => `%${t.replace(/[\\%_]/g, '\\$&')}%`);
   const { rows } = await q(
     `SELECT p.id, p.name, p.hidden, p.updated_at, p.data->>'${COL.producer}' AS producer, p.data->>'${COL.type}' AS type,
-            p.data->>'${COL.location}' AS location, (f.user_id IS NOT NULL) AS favorite
+            p.data->>'${COL.location}' AS location, p.data->>'${COL.unicef}' AS unicef, p.specs, (f.user_id IS NOT NULL) AS favorite
        FROM products p
        LEFT JOIN favorites f ON f.product_id = p.id AND f.user_id = $1
       WHERE ($2 = '' OR p.name ILIKE ANY($3) OR EXISTS (SELECT 1 FROM jsonb_each_text(p.data) e WHERE e.value ILIKE ANY($3)))

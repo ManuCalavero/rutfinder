@@ -1,9 +1,9 @@
 </main>
-<% if (user && user.role === 'admin') { %></div></div><% } %>
+<% if (user) { %></div></div><% } %>
 <% if (!user && !locals.bare) { %>
 <%# Pie de la web pública: claim, llamadas a la acción, enlaces y selector de idioma %>
 <% const cols = [
-     [t('footer.colDirectory'), [['/#proposito', t('nav.what')], ['/', t('footer.search')]]],
+     [t('footer.colDirectory'), [['/#proposito', t('nav.what')], ['/', t('footer.search')], ['/normas', t('nav.standards')]]],
      [t('footer.colAccount'), [['/registro', t('nav.signup')], ['/login', t('nav.login')]]],
      [t('footer.colCompany'), [['/sobre', t('nav.about')], ['/#contacto', t('nav.contact')], ['/#contacto', t('footer.addProduct')]]],
    ]; %>
@@ -26,7 +26,7 @@
   <div class="footer-bottom">
     <%- include('lang', { up: true }) %>
     <nav class="footer-legal" aria-label="<%= t('footer.legalLabel') %>"><a href="/privacidad"><%= t('footer.privacy') %></a><a href="/aviso-legal"><%= t('footer.legal') %></a></nav>
-    <p><a class="brand" href="/"><img src="/logo.svg" alt="" width="20" height="20">RUTFinder</a><span>© <%= year %></span></p>
+    <p><a class="brand" href="/"><img src="/logo.png" alt="" width="20" height="20">RUTFinder</a><span>© <%= year %></span></p>
   </div>
 </footer>
 <% } %>

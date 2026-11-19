@@ -1,0 +1,79 @@
+<%# Semáforo de normas de la ficha (standards.js): UNICEF, composición y seguridad frente a Codex y UNICEF.
+    Recibe std (evaluate), unicef (unicefInfo) y specs (products.specs). Textos: standards.* en locales. %>
+<% const bar = (s) => [['in', s.in], ['out', s.out], ['none', s.none]].filter(([, n]) => n).map(([k, n]) => `<i class="b-${k}" style="flex: ${n}"></i>`).join(''); %>
+<section class="box section std" id="standards" aria-labelledby="t-standards">
+  <h2 id="t-standards"><%- icon('standards') %><%= t('standards.section') %></h2>
+
+  <div class="std-tiles">
+    <div class="std-tile">
+      <p class="std-tile-label"><%= t('standards.unicefTile') %></p>
+      <% if (unicef.approved) { %>
+        <p class="std-tile-value std-ok"><%- icon('check') %><%= t('standards.unicefYes') %></p>
+      <% } else { %>
+        <p class="std-tile-value std-quiet"><%= t('standards.unicefNo') %></p>
+      <% } %>
+      <% if (specs.unicefChecked || unicef.link) { %>
+        <p class="std-tile-note">
+          <% if (specs.unicefChecked) { %><%= t('standards.unicefChecked', { date: longDate(specs.unicefChecked) }) %><% } %>
+          <% if (specs.unicefChecked && unicef.link) { %> · <% } %>
+          <% if (unicef.link) { %><a class="link" href="<%= unicef.link %>" target="_blank" rel="noopener noreferrer nofollow"><%= t('standards.unicefLink') %></a><% } %>
+        </p>
+      <% } %>
+    </div>
+    <% ['composition', 'safety'].forEach((g) => { const s = std.summary[g]; %>
+      <div class="std-tile">
+        <p class="std-tile-label"><%= t(`standards.groups.${g}`) %></p>
+        <% if (s.none === s.total) { %>
+          <p class="std-tile-value std-quiet"><%= t('standards.noValues') %></p>
+        <% } else { %>
+          <p class="std-tile-value"><%= t('standards.inRange', { n: s.in, total: s.total }) %></p>
+          <span class="std-bar" aria-hidden="true"><%- bar(s) %></span>
+          <% const notes = [s.out && t('standards.outCount', { n: s.out }), s.none && t('standards.noneCount', { n: s.none })].filter(Boolean); %>
+          <% if (notes.length) { %><p class="std-tile-note"><%= notes.join(' · ') %></p><% } %>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+
+  <% if (!std.hasData) { %>
+    <p class="empty-note"><%= t('standards.empty') %></p>
+  <% } else { %>
+    <% ['composition', 'safety'].forEach((g) => { const s = std.summary[g]; if (s.none === s.total) return; %>
+      <h3 class="std-subtitle"><%= t(`standards.groups.${g}`) %><% if (g === 'composition') { %> <span><%= t('standards.per100') %></span><% } %></h3>
+      <div class="table-wrap">
+        <table class="std-table">
+          <thead>
+            <tr>
+              <th scope="col"><%= t('standards.colParam') %></th>
+              <th scope="col"><%= t('standards.colDeclared') %></th>
+              <th scope="col"><%= t('standards.colReference') %></th>
+              <th scope="col" class="hide-sm"><%= t('standards.colFrom') %></th>
+              <th scope="col"><%= t('standards.colStatus') %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% std.rows.filter((r) => r.group === g).forEach((r) => { const shown = stdValue(r); %>
+              <tr>
+                <th scope="row"><%= t(`standards.params.${r.key}`) %></th>
+                <td class="std-num">
+                  <%= shown || '—' %>
+                  <% if (r.perEnergy && r.raw != null) { %><span class="std-sub"><%= numd(r.raw, r.raw < 10 ? 1 : 0) %> g/100 g</span><% } %>
+                  <% if (r.needsEnergy) { %><span class="std-sub"><%= t('standards.needsEnergy') %></span><% } %>
+                </td>
+                <td class="std-num"><%= stdRange(r) %><span class="std-sub"><%= r.refs.map((x) => t(`standards.refs.${x}`)).join(' · ') %></span></td>
+                <td class="hide-sm std-quiet"><%= r.src ? t(`standards.src.${r.src}`) : '—' %></td>
+                <td><%- stdChip(r) %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% }) %>
+  <% } %>
+
+  <p class="std-note">
+    <%= t('standards.disclaimer') %>
+    <a class="link" href="/normas"><%= t('standards.why') %></a>
+    <% if (specs.coa) { %> · <a class="link" href="<%= specs.coa %>" target="_blank" rel="noopener noreferrer nofollow"><%= t('standards.coa') %></a><% } %>
+  </p>
+</section>

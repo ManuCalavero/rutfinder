@@ -1,0 +1,68 @@
+<%# Formulario del semáforo de normas (panel, solo en español). Recibe product (con specs), std (evaluate) y suggestions (suggest).
+    Los campos se llaman s_<clave> y src_<clave> (standards.readSpecs). app.js recalcula el estado al escribir. %>
+<% const specs = product.specs || {};
+   const srcNames = { sheet: 'Ficha técnica', lab: 'Laboratorio', estimated: 'Estimado' };
+   const forJs = std.rows.map((r) => ({ key: r.key, perEnergy: r.perEnergy || 0, ratio: Boolean(r.ratio), min: r.min ?? null, max: r.max ?? null, kind: r.kind || '' }));
+   const labels = { in: t('standards.status.in'), low: t('standards.status.low'), high: t('standards.status.high'), none: t('standards.status.none'), present: t('standards.present'),
+     inRange: t('standards.inRange'), outCount: t('standards.outCount'), noneCount: t('standards.noneCount') };
+   const asInput = (v) => (v == null ? '' : String(v).replace('.', ','));
+   const s = std.summary.all; %>
+<section class="box section std-form" id="standards" aria-labelledby="t-standards" data-std="<%= JSON.stringify(forJs) %>" data-std-labels="<%= JSON.stringify(labels) %>">
+  <h2 id="t-standards"><%- icon('standards') %>Normas (semáforo)</h2>
+  <p class="std-intro">Escribe los valores como vienen en la ficha técnica, en números. Lo que dejes vacío saldrá como «Sin dato» en la ficha. El estado se calcula mientras escribes; las cifras de referencia están en <a class="link" href="/normas" target="_blank">/normas</a>.</p>
+  <p class="std-summary" data-std-summary><%= [t('standards.inRange', { n: s.in, total: s.total }), s.out && t('standards.outCount', { n: s.out }), s.none && t('standards.noneCount', { n: s.none })].filter(Boolean).join(' · ') %></p>
+
+  <h3 class="std-subtitle">UNICEF</h3>
+  <div class="std-unicef">
+    <div>
+      <label for="unicefChecked">Aprobación comprobada el</label>
+      <input id="unicefChecked" name="unicefChecked" type="date" value="<%= specs.unicefChecked || '' %>">
+    </div>
+    <p class="std-hint">Si es proveedor de UNICEF, y el enlace a su aprobación, se indican en <a class="link" href="#evidence">Evidencia</a> (columnas del Excel).</p>
+  </div>
+
+  <% ['composition', 'safety'].forEach((g) => { %>
+    <h3 class="std-subtitle"><%= t(`standards.groups.${g}`) %><% if (g === 'composition') { %> <span>por 100 g</span><% } %></h3>
+    <div class="std-rows">
+      <% std.rows.filter((r) => r.group === g).forEach((r) => { const label = t(`standards.params.${r.key}`); const sug = suggestions[r.key]; %>
+        <div class="std-row">
+          <div class="std-row-label">
+            <label for="s_<%= r.key %>"><%= label %></label>
+            <span class="std-hint"><%= r.refs.map((x) => t(`standards.refs.${x}`)).join(' · ') %>: <%= stdRange(r) %><%= r.perEnergy ? ' (se calcula con la energía)' : '' %></span>
+          </div>
+          <% if (r.kind === 'absence') { %>
+            <select id="s_<%= r.key %>" name="s_<%= r.key %>">
+              <option value="">Sin dato</option>
+              <option value="absent" <%= specs[r.key] === 'absent' ? 'selected' : '' %>>Ausente en 25 g</option>
+              <option value="present" <%= specs[r.key] === 'present' ? 'selected' : '' %>>Presente</option>
+            </select>
+          <% } else { %>
+            <div class="std-input">
+              <input id="s_<%= r.key %>" name="s_<%= r.key %>" type="text" inputmode="decimal" value="<%= asInput(specs[r.key]) %>" placeholder="—" maxlength="20" autocomplete="off">
+              <span><%= r.inUnit %></span>
+            </div>
+          <% } %>
+          <select name="src_<%= r.key %>" aria-label="Fuente: <%= label %>">
+            <option value="">Fuente…</option>
+            <% sources.forEach((src) => { %><option value="<%= src %>" <%= r.src === src ? 'selected' : '' %>><%= srcNames[src] %></option><% }) %>
+          </select>
+          <span class="std-status" data-status="<%= r.key %>"><%- stdChip(r) %></span>
+          <% if (sug) { %>
+            <p class="std-sug">
+              <span>Encontrado en «<%= sug.field %>»: <q><%= sug.line %></q></span>
+              <button type="button" class="btn btn-sm" data-fill="s_<%= r.key %>" data-value="<%= asInput(sug.value) %>" hidden>Usar <%= asInput(sug.value) %></button>
+            </p>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+  <% }) %>
+
+  <label for="coa">Enlace al certificado de análisis <span class="std-hint">(opcional)</span></label>
+  <input id="coa" name="coa" type="url" value="<%= specs.coa || '' %>" placeholder="https://…" maxlength="500">
+
+  <%# Plantillas de las etiquetas de estado para app.js (mismo HTML que stdChip). %>
+  <template data-chip="in"><span class="std-chip std-in"><%- icon('check') %><b></b></span></template>
+  <template data-chip="out"><span class="std-chip std-out"><%- icon('x') %><b></b></span></template>
+  <template data-chip="none"><span class="std-chip std-none"><%- icon('minus') %><b></b></span></template>
+</section>

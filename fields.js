@@ -89,6 +89,14 @@ function pick(data, key) {
   return name ? data[name] : '';
 }
 
+// La columna «UNICEF supplier» es texto libre: cuenta como proveedor si tiene algo que no sea un «no».
+const isUnicef = (value) => Boolean(String(value || '').trim()) && !/^(no|none|n\/?a|-|–|unknown|desconocido)\b/i.test(String(value).trim());
+// Proveedor de UNICEF y enlace a la aprobación (primera URL de «Link for UNICEF verified approvals»).
+const unicefInfo = (data = {}) => ({
+  approved: isUnicef(pick(data, 'UNICEF supplier')),
+  link: (String(pick(data, 'Link for UNICEF verified approvals')).match(/https?:\/\/[^\s<>"]*[^\s<>".,;:)\]]/) || [''])[0],
+});
+
 // Texto corto para el tipo de producción (se repite mucho y en inglés en el Excel).
 function typeLabel(value, t = T[DEFAULT]) {
   const v = norm(value || '');
@@ -118,7 +126,7 @@ function badges(data, t = T[DEFAULT]) {
   const pub = norm(pick(data, 'Peer-reviewed / Grey literature'));
   if (pub.startsWith('peer')) add('evidence', t('badges.peer'));
   else if (pub.startsWith('grey') || pub.startsWith('gray')) add('evidence', t('badges.grey'));
-  if (pick(data, 'UNICEF supplier')) add('unicef', t('badges.unicef'));
+  if (isUnicef(pick(data, 'UNICEF supplier'))) add('unicef', t('badges.unicef'));
   return list;
 }
 
@@ -136,4 +144,4 @@ const readEstimated = (value) => ({ value: String(value || '').replace(/^\(estim
 // Primer enlace http(s) de la columna «Link» (para el botón «Ver fuente»).
 const firstUrl = (data) => (String(pick(data, 'Link')).match(/https?:\/\/[^\s<>"]*[^\s<>".,;:)\]]/) || [''])[0];
 
-module.exports = { groupFields, badges, BADGE_KINDS, typeLabel, firstUrl, kvRows, readEstimated, norm };
+module.exports = { groupFields, badges, BADGE_KINDS, typeLabel, firstUrl, kvRows, readEstimated, norm, isUnicef, unicefInfo };

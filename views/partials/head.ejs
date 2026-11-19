@@ -22,90 +22,97 @@
   <meta property="og:image:alt" content="<%= t('meta.ogAlt') %>">
   <meta property="og:locale" content="<%= langs[lang].locale.replace('-', '_') %>">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="/logo.png" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <% if (!user) { %>
   <link rel="preload" href="/fonts/roboto-condensed-latin.woff2" as="font" type="font/woff2" crossorigin>
   <% if (path === '/') { %>
   <link rel="preload" href="/fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
   <%# Fondo de papel rojo de la cabecera: es lo primero que se pinta, así que se pide antes que el CSS lo descubra %>
-  <link rel="preload" href="/images/hero-paper-900.webp" as="image" type="image/webp" media="(max-width: 639px)" fetchpriority="high">
-  <link rel="preload" href="/images/hero-paper-1600.webp" as="image" type="image/webp" media="(min-width: 640px)" fetchpriority="high">
+  <link rel="preload" href="/images/test-hero.jpeg" as="image" type="image/webp" media="(max-width: 639px)" fetchpriority="high">
+  <link rel="preload" href="/images/test-hero.jpeg" as="image" type="image/webp" media="(min-width: 640px)" fetchpriority="high">
   <% } %>
   <% } %>
   <link rel="stylesheet" href="/style.css">
   <script src="/app.js" defer></script>
 </head>
-<body class="<%= !user ? 'public' : user.role === 'admin' ? 'admin' : 'member' %><%= locals.bare ? ' bare' : '' %>">
+<body class="<%= !user ? 'public' : user.role === 'admin' ? 'app admin' : 'app member' %><%= locals.bare ? ' bare' : '' %>">
 <a class="skip-link" href="#contenido"><%= t('nav.skip') %></a>
 <% const cur = (on) => (on ? 'aria-current="page"' : ''); %>
-<% if (user && user.role === 'admin') { %>
-<%# Administración: menú lateral (secciones y bandeja) + barra superior (buscador, avisos y cuenta) %>
-<% const inbox = [['/admin/solicitudes', 'inbox', 'Solicitudes', counts.pending, 'pendientes'], ['/admin/sugerencias', 'bulb', 'Sugerencias', counts.suggestions, 'sin revisar'], ['/admin/mensajes', 'mail', 'Mensajes', counts.messages, 'sin atender']];
-   const waiting = counts.pending + counts.suggestions + counts.messages; %>
+<% if (user) { %>
+<%# Con sesión (administradores y usuarios): el mismo esqueleto. Menú lateral (secciones + tarjeta de acción)
+    y barra superior (buscador ⌘K, avisos o idioma, y cuenta). El panel va en español; la zona de usuarios, traducida. %>
+<% const admin = user.role === 'admin';
+   const inbox = admin ? [['/admin/solicitudes', 'inbox', 'Solicitudes', counts.pending, 'pendientes'], ['/admin/sugerencias', 'bulb', 'Sugerencias', counts.suggestions, 'sin revisar'], ['/admin/mensajes', 'mail', 'Mensajes', counts.messages, 'sin atender']] : [];
+   const waiting = admin ? counts.pending + counts.suggestions + counts.messages : 0; %>
 <div class="shell">
   <aside class="sidebar">
-    <a class="brand" href="/admin"><img src="/logo.svg" alt="" width="28" height="28">RUTFinder</a>
-    <nav class="side-nav" aria-label="Principal">
-      <p class="side-label">Principal</p>
-      <a href="/admin" <%- cur(path === '/admin') %>><%- icon('home') %>Inicio</a>
-      <a href="/admin/productos" <%- cur(path.startsWith('/admin/productos') || path.startsWith('/productos')) %>><%- icon('box') %>Productos</a>
-      <a href="/admin/usuarios" <%- cur(path === '/admin/usuarios') %>><%- icon('users') %>Usuarios</a>
-      <a href="/feed" <%- cur(path === '/feed') %>><%- icon('feed') %>RUTFeed</a>
-      <p class="side-label">Bandeja</p>
-      <% inbox.forEach(([href, ico, text, n, what]) => { %>
-        <a href="<%= href %>" <%- cur(path.startsWith(href) || (href === '/admin/solicitudes' && path.endsWith('/rechazar'))) %>><%- icon(ico) %><%= text %><% if (n) { %><span class="count"><%= n %><span class="sr-only"> <%= what %></span></span><% } %></a>
-      <% }) %>
+    <a class="brand" href="<%= admin ? '/admin' : '/productos' %>"><img src="/logo.png" alt="" width="28" height="28">RUTFinder</a>
+    <nav class="side-nav" aria-label="<%= t('nav.main') %>">
+      <p class="side-label"><%= t('nav.main') %></p>
+      <% if (admin) { %>
+        <a href="/admin" <%- cur(path === '/admin') %>><%- icon('home') %>Inicio</a>
+        <a href="/admin/productos" <%- cur(path.startsWith('/admin/productos') || path.startsWith('/productos')) %>><%- icon('box') %>Productos</a>
+        <a href="/admin/usuarios" <%- cur(path === '/admin/usuarios') %>><%- icon('users') %>Usuarios</a>
+        <a href="/feed" <%- cur(path === '/feed') %>><%- icon('feed') %>RUTFeed</a>
+        <a href="/normas" <%- cur(path === '/normas') %>><%- icon('standards') %><%= t('nav.standards') %></a>
+        <p class="side-label">Bandeja</p>
+        <% inbox.forEach(([href, ico, text, n, what]) => { %>
+          <a href="<%= href %>" <%- cur(path.startsWith(href) || (href === '/admin/solicitudes' && path.endsWith('/rechazar'))) %>><%- icon(ico) %><%= text %><% if (n) { %><span class="count"><%= n %><span class="sr-only"> <%= what %></span></span><% } %></a>
+        <% }) %>
+      <% } else { %>
+        <a href="/productos" <%- cur(path.startsWith('/productos')) %>><%- icon('box') %><%= t('nav.products') %></a>
+        <a href="/favoritos" <%- cur(path === '/favoritos') %>><%- icon('star') %><%= t('nav.favorites') %></a>
+        <a href="/comparar" <%- cur(path === '/comparar') %>><%- icon('swap') %><%= t('nav.compare') %></a>
+        <p class="side-label"><%= t('nav.resources') %></p>
+        <a href="/datos" <%- cur(path === '/datos') %>><%- icon('general') %><%= t('nav.data') %></a>
+        <a href="/normas" <%- cur(path === '/normas') %>><%- icon('standards') %><%= t('nav.standards') %></a>
+        <a href="/feed" <%- cur(path === '/feed') %>><%- icon('feed') %><%= t('nav.feed') %></a>
+      <% } %>
     </nav>
     <div class="side-card">
-      <p><strong>¿Excel nuevo?</strong>Revisa los cambios antes de guardarlos.</p>
-      <a class="btn btn-dark btn-block" href="/admin/productos?importar=1"><%- icon('upload') %>Importar Excel</a>
+      <% if (admin) { %>
+        <p><strong>¿Excel nuevo?</strong>Revisa los cambios antes de guardarlos.</p>
+        <a class="btn btn-dark btn-block" href="/admin/productos?importar=1"><%- icon('upload') %>Importar Excel</a>
+      <% } else { %>
+        <p><strong><%= t('nav.sideTitle') %></strong><%= t('nav.sideText') %></p>
+        <a class="btn btn-dark btn-block" href="/productos?sugerir=1"><%- icon('plus') %><%= t('products.suggest') %></a>
+      <% } %>
     </div>
   </aside>
   <div class="main-col">
     <header class="topbar">
-      <form class="topbar-search" action="/admin/productos" method="get" role="search">
-        <input id="admin-search" name="q" type="search" placeholder="Buscar productos" aria-label="Buscar productos" maxlength="100" autocomplete="off">
+      <form class="topbar-search" action="<%= admin ? '/admin/productos' : '/productos' %>" method="get" role="search">
+        <input id="app-search" name="q" type="search" placeholder="<%= t('nav.searchProducts') %>" aria-label="<%= t('nav.searchProducts') %>" maxlength="100" autocomplete="off">
         <kbd class="kbd" aria-hidden="true">⌘K</kbd>
       </form>
+      <% if (admin) { %>
       <details class="dropdown bell">
         <summary class="icon-btn" aria-label="Avisos<%= waiting ? `: ${waiting} pendientes` : '' %>"><%- icon('bell') %><% if (waiting) { %><span class="bell-dot"></span><% } %></summary>
         <nav class="dropdown-panel menu" aria-label="Avisos">
           <% inbox.forEach(([href, ico, text, n]) => { %><a href="<%= href %>"><%- icon(ico) %><%= text %><span class="menu-n<%= n ? ' on' : '' %>"><%= n %></span></a><% }) %>
         </nav>
       </details>
+      <% } else { %>
+      <%- include('lang') %>
+      <% } %>
       <%- include('account') %>
     </header>
     <main id="contenido" class="content">
-<% } else if (user) { %>
-<%# Usuarios: catálogo y favoritos %>
-<header class="header">
-  <a class="brand" href="/productos"><img src="/logo.svg" alt="" width="24" height="24">RUTFinder</a>
-  <nav class="nav" aria-label="<%= t('nav.main') %>">
-    <a href="/productos" <%- cur(path.startsWith('/productos')) %>><%= t('nav.products') %></a>
-    <a href="/favoritos" <%- cur(path === '/favoritos') %>><%= t('nav.favorites') %></a>
-    <a href="/comparar" <%- cur(path === '/comparar') %>><%= t('nav.compare') %></a>
-    <a href="/datos" <%- cur(path === '/datos') %>><%= t('nav.data') %></a>
-    <a href="/feed" <%- cur(path === '/feed') %>><%= t('nav.feed') %></a>
-  </nav>
-  <%- include('lang') %>
-  <%- include('account') %>
-</header>
-<main id="contenido" class="container">
 <% } else if (locals.bare) { %>
 <%# Páginas sueltas (login): solo el logo y el selector de idioma, sin menú ni pie %>
 <header class="bare-header">
-  <a class="brand" href="/"><img src="/logo.svg" alt="" width="26" height="26">RUTFinder</a>
+  <a class="brand" href="/"><img src="/logo.png" alt="" width="26" height="26">RUTFinder</a>
   <%- include('lang') %>
 </header>
 <main id="contenido" class="bare-main">
 <% } else { %>
 <%# Web pública: friso, menú y pie (foot.ejs) %>
-<% const links = [['/#proposito', t('nav.what')], ['/sobre', t('nav.about')], ['/#contacto', t('nav.contact')]]; %>
+<% const links = [['/#proposito', t('nav.what')], ['/sobre', t('nav.about')], ['/normas', t('nav.standards')], ['/#contacto', t('nav.contact')]]; %>
 <a class="banner" href="/#contacto"><span class="banner-ico"><%- icon('box') %></span><%= t('banner.lead') %><span class="hide-sm"><%= t('banner.more') %></span><%= t('banner.end') %> <span class="banner-cta"><%= t('banner.cta') %><%- icon('next') %></span></a>
 <header class="site-header">
   <div class="site-header-in">
-    <a class="brand" href="/"><img src="/logo.svg" alt="" width="26" height="26">RUTFinder</a>
+    <a class="brand" href="/"><img src="/logo.png" alt="" width="26" height="26">RUTFinder</a>
     <nav class="site-nav" aria-label="<%= t('nav.main') %>">
       <% links.forEach(([href, text]) => { %><a href="<%= href %>" <%- cur(path === href) %>><%= text %></a><% }) %>
     </nav>

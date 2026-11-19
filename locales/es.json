@@ -13,7 +13,12 @@
     "favorites": "Favoritos",
     "compare": "Comparar",
     "data": "Sobre los datos",
-    "feed": "RUTFeed"
+    "feed": "RUTFeed",
+    "resources": "Recursos",
+    "searchProducts": "Buscar productos",
+    "sideTitle": "¿Falta un RUTF?",
+    "sideText": "Sugiérelo y lo revisamos.",
+    "standards": "Normas RUTF"
   },
   "banner": {
     "lead": "¿Tienes o conoces un RUTF",
@@ -74,7 +79,17 @@
       "org1": "ONG",
       "org2": "Equipo de nutrición",
       "org3": "Profesional sanitario"
-    }
+    },
+    "f4Title": "Comparado con las normas oficiales.",
+    "f4Text": "Cada ficha compara sus datos con las normas de Codex y UNICEF: qué está dentro del rango, qué no y qué falta por saber.",
+    "f4NormsLabel": "Normas de referencia",
+    "f4Norms": [
+      "Codex Alimentarius · CXG 95-2022",
+      "UNICEF · Especificación S0000240",
+      "OMS · Guía de 2023 sobre emaciación"
+    ],
+    "f4Link": "Ver las normas y los rangos",
+    "f4Note": "Orientación con los datos del fabricante, no certificación."
   },
   "signup": {
     "show": "Mostrar contraseña",
@@ -82,19 +97,14 @@
     "passwordHint": "Mínimo 8 caracteres.",
     "secureTitle": "Registro seguro.",
     "secureText": "La conexión va cifrada y tu contraseña se guarda cifrada: nadie del equipo puede verla.",
-    "title": "Solicitar acceso",
-    "found": {
-      "one": "Hay {n} RUTF que coincide con «{q}»",
-      "other": "Hay {n} RUTF que coinciden con «{q}»"
-    },
-    "none": "Aún no tenemos ningún RUTF con «{q}»",
+    "title": "Regístrate",
     "noneHelp": "¿Conoces alguno?",
     "noneLink": "Cuéntanoslo",
     "askFound": {
-      "one": "Solicita acceso para verlo.",
-      "other": "Solicita acceso para verlos."
+      "one": "Regístrate para verlo.",
+      "other": "Regístrate para verlos."
     },
-    "ask": "Solicita acceso.",
+    "ask": "Regístrate para ver el directorio.",
     "why1Title": "Para profesionales",
     "why1Text": "RUTFinder es una herramienta de trabajo para ONG, equipos de nutrición y profesionales sanitarios.",
     "why2Title": "Revisión humana",
@@ -106,9 +116,18 @@
     "email": "Email",
     "organization": "Organización",
     "password": "Contraseña",
-    "submit": "Enviar solicitud",
+    "submit": "Registrarme",
     "haveAccount": "¿Ya tienes una cuenta?",
-    "privacyNote": "Usaremos tus datos para revisar tu solicitud y gestionar tu cuenta."
+    "privacyNote": "Usaremos tus datos para revisar tu solicitud y gestionar tu cuenta.",
+    "whyTitle": "¿Por qué me tengo que registrar?",
+    "matches": {
+      "one": "coincidencia con «{q}»",
+      "other": "coincidencias con «{q}»"
+    },
+    "ofTotal": "de los {n} RUTF del directorio",
+    "noneTotal": "Pero hay {n} RUTF en el directorio.",
+    "totalLabel": "RUTF en el directorio, con sus datos y sus fuentes",
+    "free": "Es gratis y te llevará un minuto."
   },
   "about": {
     "title": "Sobre nosotros",
@@ -317,7 +336,8 @@
     "about": "Por qué existe RUTFinder y cómo trabajamos: reunimos informes, artículos revisados por pares y datos de fabricantes sobre cada RUTF, sin estimar ni inventar datos.",
     "signup": "Solicita acceso a RUTFinder, el directorio de alimentos terapéuticos listos para usar (RUTF) para ONG, equipos de nutrición y profesionales sanitarios.",
     "ogAlt": "RUTFinder: todos los RUTF, en un solo lugar.",
-    "ogLine": "Directorio mundial de alimentos terapéuticos listos para usar"
+    "ogLine": "Directorio mundial de alimentos terapéuticos listos para usar",
+    "standards": "Las normas oficiales que definen un RUTF (Codex CXG 95-2022, especificación de UNICEF y guías de la OMS) y los rangos de composición y seguridad que usa RUTFinder."
   },
   "legalPages": {
     "readMore": "Política de privacidad",
@@ -421,5 +441,118 @@
         }
       ]
     }
+  },
+  "standards": {
+    "title": "Normas RUTF",
+    "heading": "Normas y guías sobre RUTF",
+    "lead": "Las referencias oficiales que definen cómo debe ser un RUTF. RUTFinder las usa para comparar los datos de cada ficha.",
+    "reviewed": "Última revisión: {date}",
+    "guidesTitle": "Documentos oficiales",
+    "open": "Ver el documento oficial",
+    "guides": {
+      "codex": {
+        "org": "FAO / OMS · Codex Alimentarius",
+        "title": "Directrices para los alimentos terapéuticos listos para el consumo (CXG 95-2022)",
+        "text": "La norma internacional de los RUTF: composición, ingredientes, higiene, envase y etiquetado."
+      },
+      "unicefSpec": {
+        "org": "UNICEF Supply Division",
+        "title": "Especificación del RUTF en pasta, sobre de 92 g (S0000240, versión 4.1)",
+        "text": "Lo que UNICEF exige al RUTF que compra: composición, análisis de cada lote, envase y vida útil. En inglés."
+      },
+      "who2023": {
+        "org": "OMS",
+        "title": "Guía sobre la prevención y el manejo de la emaciación y el edema nutricional en menores de 5 años",
+        "text": "Cuándo y cómo se trata con RUTF: a quién, cuánto y durante cuánto tiempo."
+      },
+      "who2021": {
+        "org": "OMS",
+        "title": "Guía sobre el contenido de proteína láctea de los RUTF",
+        "text": "Recomienda seguir usando RUTF con al menos la mitad de la proteína de origen lácteo, porque dan mejores resultados."
+      },
+      "unicefPage": {
+        "org": "UNICEF Supply Division",
+        "title": "El RUTF en la web de suministros de UNICEF",
+        "text": "Mercado, proveedores, precios y novedades de suministro."
+      },
+      "joint2007": {
+        "org": "OMS · PMA · UNSCN · UNICEF",
+        "title": "Declaración conjunta sobre el manejo comunitario de la desnutrición aguda grave",
+        "text": "El origen del tratamiento en casa con RUTF y de su primera especificación de composición."
+      }
+    },
+    "howTitle": "Cómo las usa RUTFinder",
+    "howText": "Cada ficha compara los datos que publica el fabricante con estos rangos y marca cada valor como dentro, fuera o sin dato. Los valores por 100 g se pasan a % de la energía o a mg por 100 kcal cuando la norma los da así.",
+    "colParam": "Parámetro",
+    "colRange": "Rango",
+    "colSource": "Norma",
+    "notCert": "Es una orientación, no una certificación. Para comprar, pide siempre el certificado de análisis de cada lote y comprueba la aprobación de UNICEF en su fuente.",
+    "other": "Los suplementos para la desnutrición moderada (RUSF, suplementos lipídicos o harinas enriquecidas) no son RUTF y tienen sus propias especificaciones, sobre todo del Programa Mundial de Alimentos.",
+    "params": {
+      "energy": "Energía",
+      "protein": "Proteína",
+      "pdcaas": "Calidad de la proteína (PDCAAS)",
+      "dairy": "Proteína de origen lácteo",
+      "fat": "Grasa",
+      "n6": "Ácidos grasos omega-6",
+      "n3": "Ácidos grasos omega-3",
+      "aw": "Actividad de agua",
+      "moisture": "Humedad",
+      "aflatoxin": "Aflatoxinas totales",
+      "salmonella": "Salmonella",
+      "entero": "Enterobacterias"
+    },
+    "units": {
+      "kcal100": "kcal/100 g",
+      "pctE": "% de la energía",
+      "ratio": "",
+      "pctProtein": "% de la proteína",
+      "mg100kcal": "mg/100 kcal",
+      "pct": "%",
+      "ugkg": "µg/kg",
+      "cfug": "ufc/g"
+    },
+    "refs": {
+      "codex": "Codex",
+      "unicef": "UNICEF"
+    },
+    "absent25": "Ausente en 25 g",
+    "absent": "Ausente",
+    "present": "Presente",
+    "section": "Normas",
+    "unicefTile": "Proveedor de UNICEF",
+    "unicefYes": "Aprobado",
+    "unicefNo": "No consta",
+    "unicefChecked": "Comprobado el {date}",
+    "unicefLink": "Ver la aprobación",
+    "groups": {
+      "composition": "Composición",
+      "safety": "Seguridad alimentaria"
+    },
+    "inRange": "{n} de {total} dentro del rango",
+    "outCount": "{n} fuera del rango",
+    "noneCount": "{n} sin dato",
+    "noValues": "Sin datos todavía",
+    "colDeclared": "Declarado",
+    "colReference": "Referencia",
+    "colStatus": "Estado",
+    "colFrom": "Fuente del dato",
+    "status": {
+      "in": "Dentro",
+      "low": "Por debajo",
+      "high": "Por encima",
+      "none": "Sin dato"
+    },
+    "src": {
+      "sheet": "Ficha técnica",
+      "lab": "Laboratorio",
+      "estimated": "Estimado"
+    },
+    "needsEnergy": "Falta la energía para calcularlo",
+    "per100": "por 100 g",
+    "disclaimer": "RUTFinder compara los datos que declara el fabricante con las normas de Codex y UNICEF. Es una orientación, no una certificación.",
+    "why": "¿De dónde salen estos rangos?",
+    "empty": "Todavía no hay datos para comparar este producto con las normas.",
+    "coa": "Certificado de análisis"
   }
 }
